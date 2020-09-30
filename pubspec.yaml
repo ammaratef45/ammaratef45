@@ -12,9 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   avatar_glow: ^1.2.0
-
-
   cupertino_icons: ^1.0.0
+  font_awesome_flutter: ^8.8.1
 
 dev_dependencies:
   flutter_test:

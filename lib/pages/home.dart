@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -16,6 +17,7 @@ class HomePage extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -51,13 +53,73 @@ class HomePage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text('data'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.facebook,
+                          color: Color(0xff3b5998),
+                        ),
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.twitter,
+                          color: Color(0xff55acee),
+                        ),
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.linkedin,
+                          color: Color(0xff007bb5),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.github,
+                          color: Color(0xff000000),
+                        ),
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.instagram,
+                          color: Color(0xff125688),
+                        ),
+                        LinkIcon(
+                          iconData: FontAwesomeIcons.envelope,
+                          color: Color(0xff865dae),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class LinkIcon extends StatelessWidget {
+  final IconData iconData;
+  final Color color;
+  const LinkIcon({
+    Key key,
+    @required this.iconData,
+    @required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 55,
+      child: IconButton(
+        icon: FaIcon(
+          iconData,
+          size: 40,
+          color: color,
+        ),
+        onPressed: () {
+          print("Pressed");
+        },
       ),
     );
   }
