@@ -1,4 +1,5 @@
 import 'package:ammaratef45Flutter/pages/home.dart';
+import 'package:ammaratef45Flutter/pages/projects.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,6 +16,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomePage(),
+      routes: {
+        ProjectsPage.ROUTE: (context) => ProjectsPage(),
+      },
     );
   }
 }

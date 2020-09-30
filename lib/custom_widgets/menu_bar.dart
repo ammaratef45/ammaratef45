@@ -1,3 +1,4 @@
+import 'package:ammaratef45Flutter/pages/projects.dart';
 import 'package:flutter/material.dart';
 
 class MenuBar extends StatelessWidget {
@@ -32,7 +33,9 @@ class MenuBar extends StatelessWidget {
             width: 15,
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, ProjectsPage.ROUTE);
+            },
             child: Text('Projects'),
           ),
           SizedBox(
