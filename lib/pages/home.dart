@@ -1,6 +1,8 @@
 import 'dart:ui';
-
-import 'package:avatar_glow/avatar_glow.dart';
+import 'dart:js' as js;
+import 'package:ammaratef45Flutter/custom_widgets/header.dart';
+import 'package:ammaratef45Flutter/custom_widgets/link_icon.dart';
+import 'package:ammaratef45Flutter/custom_widgets/menu_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -25,6 +27,7 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    // TODO get the info about me from a firebase database
                     Text(
                       'About me',
                       style: TextStyle(
@@ -59,14 +62,32 @@ class HomePage extends StatelessWidget {
                         LinkIcon(
                           iconData: FontAwesomeIcons.facebook,
                           color: Color(0xff3b5998),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['https://www.facebook.com/ammaratef45'],
+                            );
+                          },
                         ),
                         LinkIcon(
                           iconData: FontAwesomeIcons.twitter,
                           color: Color(0xff55acee),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['https://twitter.com/ammaratef45'],
+                            );
+                          },
                         ),
                         LinkIcon(
                           iconData: FontAwesomeIcons.linkedin,
                           color: Color(0xff007bb5),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['https://www.linkedin.com/in/ammaratef45/'],
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -76,14 +97,32 @@ class HomePage extends StatelessWidget {
                         LinkIcon(
                           iconData: FontAwesomeIcons.github,
                           color: Color(0xff000000),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['https://github.com/ammaratef45'],
+                            );
+                          },
                         ),
                         LinkIcon(
                           iconData: FontAwesomeIcons.instagram,
                           color: Color(0xff125688),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['https://www.instagram.com/ammar.atef45/'],
+                            );
+                          },
                         ),
                         LinkIcon(
                           iconData: FontAwesomeIcons.envelope,
                           color: Color(0xff865dae),
+                          onPressed: () {
+                            js.context.callMethod(
+                              'open',
+                              ['mailto:ammar.atef45@gmail.com'],
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -91,124 +130,6 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class LinkIcon extends StatelessWidget {
-  final IconData iconData;
-  final Color color;
-  const LinkIcon({
-    Key key,
-    @required this.iconData,
-    @required this.color,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 55,
-      child: IconButton(
-        icon: FaIcon(
-          iconData,
-          size: 40,
-          color: color,
-        ),
-        onPressed: () {
-          print("Pressed");
-        },
-      ),
-    );
-  }
-}
-
-class Header extends StatelessWidget {
-  const Header({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.lightBlue,
-      width: double.infinity,
-      child: Column(
-        children: [
-          AvatarGlow(
-            endRadius: 90,
-            duration: Duration(seconds: 2),
-            glowColor: Colors.white24,
-            repeat: true,
-            repeatPauseDuration: Duration(seconds: 2),
-            startDelay: Duration(seconds: 1),
-            child: Material(
-                elevation: 8.0,
-                shape: CircleBorder(),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey[100],
-                  child: Image.asset('assets/avatar.jpg'),
-                  radius: 50.0,
-                )),
-          ),
-          Text(
-            'Ammar Hussein',
-            style: TextStyle(
-              fontSize: 35,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text('Software Engineer - Blogger - Vegan'),
-          SizedBox(
-            height: 20,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MenuBar extends StatelessWidget {
-  const MenuBar({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      height: 60,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 20,
-          ),
-          Text(
-            'Ammar Hussein',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 27,
-            ),
-          ),
-          Spacer(),
-          InkWell(
-            onTap: () {},
-            child: Text('Blog'),
-          ),
-          SizedBox(
-            width: 15,
-          ),
-          InkWell(
-            onTap: () {},
-            child: Text('Projects'),
-          ),
-          SizedBox(
-            width: 15,
           ),
         ],
       ),
