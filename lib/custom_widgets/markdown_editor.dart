@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 
-// TODO scrolling the preview
 class MarkDownEditor extends StatefulWidget {
   @override
   _MarkDownEditorState createState() => _MarkDownEditorState();
@@ -30,7 +29,9 @@ class _MarkDownEditorState extends State<MarkDownEditor> {
             );
           },
         ),
-        MarkdownPreview(text: _textController.text),
+        Flexible(
+          child: MarkdownPreview(text: _textController.text),
+        ),
       ],
     );
   }
@@ -48,14 +49,19 @@ class MarkdownPreview extends StatelessWidget {
   // TODO add emoji selector to the editor
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Markdown(
-        controller: ScrollController(),
-        data: text,
-        shrinkWrap: true,
-        extensionSet: md.ExtensionSet(
-          md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-          [md.EmojiSyntax(), ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes],
+    return Scrollbar(
+      child: SingleChildScrollView(
+        child: Markdown(
+          controller: ScrollController(),
+          data: text,
+          shrinkWrap: true,
+          extensionSet: md.ExtensionSet(
+            md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            [
+              md.EmojiSyntax(),
+              ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+            ],
+          ),
         ),
       ),
     );
