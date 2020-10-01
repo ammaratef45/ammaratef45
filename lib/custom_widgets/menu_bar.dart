@@ -1,9 +1,12 @@
+import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:ammaratef45Flutter/pages/projects.dart';
 import 'package:flutter/material.dart';
 
 class MenuBar extends StatelessWidget {
+  final MyInfo myInfo;
   const MenuBar({
     Key key,
+    @required this.myInfo,
   }) : super(key: key);
 
   @override
@@ -17,7 +20,7 @@ class MenuBar extends StatelessWidget {
             width: 20,
           ),
           Text(
-            'Ammar Hussein',
+            myInfo.name,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 27,

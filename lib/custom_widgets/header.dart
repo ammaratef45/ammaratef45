@@ -1,9 +1,12 @@
+import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
+  final MyInfo myInfo;
   const Header({
     Key key,
+    @required this.myInfo,
   }) : super(key: key);
 
   @override
@@ -30,7 +33,7 @@ class Header extends StatelessWidget {
                 )),
           ),
           Text(
-            'Ammar Hussein',
+            myInfo.name,
             style: TextStyle(
               fontSize: 35,
               fontWeight: FontWeight.bold,
@@ -39,7 +42,7 @@ class Header extends StatelessWidget {
           SizedBox(
             height: 20,
           ),
-          Text('Software Engineer - Blogger - Vegan'),
+          Text(myInfo.subtitle),
           SizedBox(
             height: 20,
           ),
