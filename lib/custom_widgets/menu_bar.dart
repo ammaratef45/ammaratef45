@@ -20,7 +20,7 @@ class MenuBar extends StatelessWidget {
           SizedBox(
             width: 20,
           ),
-          Text(
+          SelectableText(
             myInfo.name,
             style: TextStyle(
               fontWeight: FontWeight.bold,

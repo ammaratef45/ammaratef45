@@ -7,7 +7,7 @@ class LoadingView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          SelectableText(
             'loading...',
             style: TextStyle(
               fontWeight: FontWeight.bold,

@@ -1,3 +1,5 @@
+import 'package:ammaratef45Flutter/custom_widgets/error.dart';
+import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
 import 'package:ammaratef45Flutter/models/project.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +24,9 @@ class ProjectsPage extends StatelessWidget {
       body: FutureBuilder<List<Project>>(
           future: projects,
           builder: (context, snapshot) {
-            if (snapshot.hasError) return Text(snapshot.error.toString());
-            if (!snapshot.hasData) return Text('laoding');
+            if (snapshot.hasError)
+              return ErrorView(error: snapshot.error.toString());
+            if (!snapshot.hasData) return LoadingView();
             return Wrap(
               children: [
                 ...snapshot.data
@@ -73,9 +76,10 @@ class ProjectCard extends StatelessWidget {
                 padding: EdgeInsets.all(6),
                 color: Colors.white,
                 child: Center(
-                  child: Text(
+                  // TODO find a solution for overflow
+                  child: SelectableText(
                     project.name,
-                    overflow: TextOverflow.ellipsis,
+                    //overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 22,
                     ),

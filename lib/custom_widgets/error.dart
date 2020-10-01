@@ -7,7 +7,7 @@ class ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(
+      child: SelectableText(
         error,
         style: TextStyle(
           color: Colors.red,

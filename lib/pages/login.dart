@@ -26,7 +26,7 @@ class LoginPage extends StatelessWidget {
               color: Colors.white,
             ),
             child: Center(
-              child: Text(
+              child: SelectableText(
                 'Login with Google',
                 style: TextStyle(
                   fontSize: 20.0,

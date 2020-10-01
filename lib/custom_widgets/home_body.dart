@@ -21,14 +21,14 @@ class HomeBody extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Text(
+              SelectableText(
                 'About me',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(myInfo.about),
+              SelectableText(myInfo.about),
             ],
           ),
         ),
@@ -41,7 +41,7 @@ class HomeBody extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Text(
+              SelectableText(
                 'Contact Me',
                 style: TextStyle(
                   fontSize: 30,

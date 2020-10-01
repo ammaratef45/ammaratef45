@@ -7,7 +7,6 @@ import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:ammaratef45Flutter/services/info_service.dart';
 import 'package:flutter/material.dart';
 
-// TODO allow copy paste
 class HomePage extends StatelessWidget {
   final InfoService infoService = InfoService.instance;
   @override
@@ -32,7 +31,6 @@ class HomePage extends StatelessWidget {
                   SizedBox(
                     height: 20,
                   ),
-                  // TODO extract into other widgets
                   HomeBody(
                     myInfo: snapshot.data,
                   ),

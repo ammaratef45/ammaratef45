@@ -32,7 +32,7 @@ class Header extends StatelessWidget {
                   radius: 50.0,
                 )),
           ),
-          Text(
+          SelectableText(
             myInfo.name,
             style: TextStyle(
               fontSize: 35,
@@ -42,7 +42,7 @@ class Header extends StatelessWidget {
           SizedBox(
             height: 20,
           ),
-          Text(myInfo.subtitle),
+          SelectableText(myInfo.subtitle),
           SizedBox(
             height: 20,
           ),
