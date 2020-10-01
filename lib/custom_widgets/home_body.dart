@@ -1,4 +1,4 @@
-import 'dart:js' as js;
+import 'package:universal_html/prefer_universal/js.dart' as js;
 import 'package:ammaratef45Flutter/custom_widgets/link_icon.dart';
 import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:flutter/material.dart';
