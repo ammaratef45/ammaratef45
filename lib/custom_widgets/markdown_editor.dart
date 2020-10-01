@@ -1,8 +1,8 @@
 import 'package:ammaratef45Flutter/custom_widgets/editor_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 
-// TODO add support for empjis
 // TODO scrolling the preview
 class MarkDownEditor extends StatefulWidget {
   @override
@@ -36,6 +36,7 @@ class _MarkDownEditorState extends State<MarkDownEditor> {
   }
 }
 
+// TODO take these widgets in seperate files
 class MarkdownPreview extends StatelessWidget {
   const MarkdownPreview({
     Key key,
@@ -44,6 +45,7 @@ class MarkdownPreview extends StatelessWidget {
 
   final String text;
 
+  // TODO add emoji selector to the editor
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -51,6 +53,10 @@ class MarkdownPreview extends StatelessWidget {
         controller: ScrollController(),
         data: text,
         shrinkWrap: true,
+        extensionSet: md.ExtensionSet(
+          md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+          [md.EmojiSyntax(), ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes],
+        ),
       ),
     );
   }
