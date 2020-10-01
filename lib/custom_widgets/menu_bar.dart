@@ -1,4 +1,5 @@
 import 'package:ammaratef45Flutter/models/myinfo.dart';
+import 'package:ammaratef45Flutter/pages/blog.dart';
 import 'package:ammaratef45Flutter/pages/projects.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +28,10 @@ class MenuBar extends StatelessWidget {
             ),
           ),
           Spacer(),
-          // TODO make the buttons open blog and projects pages.
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, BlogPage.ROUTE);
+            },
             child: Text('Blog'),
           ),
           SizedBox(

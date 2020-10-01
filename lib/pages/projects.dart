@@ -5,6 +5,7 @@ class ProjectsPage extends StatelessWidget {
   static const String ROUTE = 'projects';
   Future<List<Project>> projects;
 
+  // Finish implementing the projects page
   ProjectsPage() {
     // TODO get these using a service from a firebase database
     projects = Future.delayed(
