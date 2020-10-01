@@ -1,40 +1,32 @@
 import 'package:ammaratef45Flutter/custom_widgets/error.dart';
 import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
 import 'package:ammaratef45Flutter/models/project.dart';
+import 'package:ammaratef45Flutter/services/project_service.dart';
 import 'package:flutter/material.dart';
 
 class ProjectsPage extends StatelessWidget {
   static const String ROUTE = 'projects';
-  Future<List<Project>> projects;
-
-  // Finish implementing the projects page
-  ProjectsPage() {
-    // TODO get these using a service from a firebase database
-    projects = Future.delayed(
-        Duration(seconds: 3),
-        () => [
-              Project('P1', 'Desc',
-                  'https://www.xda-developers.com/files/2020/06/new-google-photos-logo.jpg'),
-            ]);
-  }
+  final ProjectsService projectsService = ProjectsService.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<Project>>(
-          future: projects,
+      body: StreamBuilder<List<Project>>(
+          stream: projectsService.getProjectsStream(),
           builder: (context, snapshot) {
             if (snapshot.hasError)
               return ErrorView(error: snapshot.error.toString());
             if (!snapshot.hasData) return LoadingView();
-            return Wrap(
-              children: [
-                ...snapshot.data
-                    .map(
-                      (project) => ProjectCard(project: project),
-                    )
-                    .toList()
-              ],
+            return SingleChildScrollView(
+              child: Wrap(
+                children: [
+                  ...snapshot.data
+                      .map(
+                        (project) => ProjectCard(project: project),
+                      )
+                      .toList()
+                ],
+              ),
             );
           }),
     );
@@ -52,7 +44,7 @@ class ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 800,
       width: 400,
       child: Card(
         color: Theme.of(context).accentColor,
@@ -61,7 +53,7 @@ class ProjectCard extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              flex: 3,
+              flex: 4,
               child: Container(
                 width: double.infinity,
                 child: Image.network(
@@ -76,10 +68,8 @@ class ProjectCard extends StatelessWidget {
                 padding: EdgeInsets.all(6),
                 color: Colors.white,
                 child: Center(
-                  // TODO find a solution for overflow
                   child: SelectableText(
                     project.name,
-                    //overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 22,
                     ),
@@ -88,14 +78,16 @@ class ProjectCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              flex: 1,
+              flex: 4,
               child: Container(
                 color: Colors.green,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Icon(Icons.share),
-                  ],
+                child: Center(
+                  child: SelectableText(
+                    project.description,
+                    style: TextStyle(
+                      fontSize: 22,
+                    ),
+                  ),
                 ),
               ),
             ),
