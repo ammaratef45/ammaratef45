@@ -4,7 +4,6 @@ import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// TODO optimize for mobile devices
 class HomeBody extends StatelessWidget {
   final MyInfo myInfo;
   const HomeBody({
@@ -14,9 +13,7 @@ class HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
       children: [
         ConstrainedBox(
           constraints: BoxConstraints(

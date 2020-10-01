@@ -18,22 +18,24 @@ class HomePage extends StatelessWidget {
             // TODO handle error and loading appropiately
             if (snapshot.hasError) return Text(snapshot.error.toString());
             if (!snapshot.hasData) return Text('loading...');
-            return Column(
-              children: [
-                MenuBar(
-                  myInfo: snapshot.data,
-                ),
-                Header(
-                  myInfo: snapshot.data,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                // TODO extract into other widgets
-                HomeBody(
-                  myInfo: snapshot.data,
-                ),
-              ],
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  MenuBar(
+                    myInfo: snapshot.data,
+                  ),
+                  Header(
+                    myInfo: snapshot.data,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  // TODO extract into other widgets
+                  HomeBody(
+                    myInfo: snapshot.data,
+                  ),
+                ],
+              ),
             );
           }),
     );
