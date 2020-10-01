@@ -1,4 +1,6 @@
+import 'package:ammaratef45Flutter/pages/admin.dart';
 import 'package:ammaratef45Flutter/pages/home.dart';
+import 'package:ammaratef45Flutter/pages/login.dart';
 import 'package:ammaratef45Flutter/pages/projects.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,8 @@ class MyApp extends StatelessWidget {
           }),
       routes: {
         ProjectsPage.ROUTE: (context) => ProjectsPage(),
+        AdminPage.ROUTE: (context) => AdminPage(),
+        LoginPage.ROUTE: (context) => LoginPage(),
       },
     );
   }
