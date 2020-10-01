@@ -5,7 +5,10 @@ class BlogPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Center(
+      child: Text(
+        'Waiting for firebase storage flutter support to be available for beta testing',
+      ),
+    );
   }
 }
