@@ -1,3 +1,5 @@
+import 'package:ammaratef45Flutter/custom_widgets/error.dart';
+import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
 import 'package:ammaratef45Flutter/pages/admin.dart';
 import 'package:ammaratef45Flutter/pages/blog.dart';
 import 'package:ammaratef45Flutter/pages/home.dart';
@@ -23,12 +25,17 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder<FirebaseApp>(
           future: _initialization,
           builder: (context, snapshot) {
-            // TODO handle error and loading appropiately
             if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
+              return Scaffold(
+                body: ErrorView(
+                  error: snapshot.error.toString(),
+                ),
+              );
             }
             if (!snapshot.hasData) {
-              return Text('No data yet');
+              return Scaffold(
+                body: LoadingView(),
+              );
             }
             return HomePage();
           }),

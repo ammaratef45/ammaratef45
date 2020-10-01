@@ -1,5 +1,7 @@
+import 'package:ammaratef45Flutter/custom_widgets/error.dart';
 import 'package:ammaratef45Flutter/custom_widgets/header.dart';
 import 'package:ammaratef45Flutter/custom_widgets/home_body.dart';
+import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
 import 'package:ammaratef45Flutter/custom_widgets/menu_bar.dart';
 import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:ammaratef45Flutter/services/info_service.dart';
@@ -15,9 +17,9 @@ class HomePage extends StatelessWidget {
       body: FutureBuilder<MyInfo>(
           future: infoService.getMyInfo(),
           builder: (context, snapshot) {
-            // TODO handle error and loading appropiately
-            if (snapshot.hasError) return Text(snapshot.error.toString());
-            if (!snapshot.hasData) return Text('loading...');
+            if (snapshot.hasError)
+              return ErrorView(error: snapshot.error.toString());
+            if (!snapshot.hasData) return LoadingView();
             return SingleChildScrollView(
               child: Column(
                 children: [
