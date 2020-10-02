@@ -1,7 +1,6 @@
 import 'package:ammaratef45Flutter/models/project.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// TODO complete implementation for adding projects (admin usage)
 class ProjectsService {
   static const String PROJECTS_COLLECTION = 'projects';
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
@@ -22,11 +21,20 @@ class ProjectsService {
       List<Project> res = [];
       for (final doc in snap.docs) {
         final data = doc.data();
-        final Project project =
-            Project(data['name'], data['description'], data['image']);
+        final Project project = Project.fromDoc(doc.id, data);
         res.add(project);
       }
       yield res;
     }
+  }
+
+  Future<void> addProject(Project project) async {
+    if (project.id.isEmpty)
+      await _fireStore.collection(PROJECTS_COLLECTION).add(project.doc);
+    else
+      await _fireStore
+          .collection(PROJECTS_COLLECTION)
+          .doc(project.id)
+          .update(project.doc);
   }
 }

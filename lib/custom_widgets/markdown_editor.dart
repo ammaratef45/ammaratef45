@@ -4,25 +4,30 @@ import 'package:ammaratef45Flutter/custom_widgets/markdown_preview.dart';
 import 'package:flutter/material.dart';
 
 class MarkDownEditor extends StatefulWidget {
+  final TextEditingController controller;
+
+  const MarkDownEditor({Key key, this.controller}) : super(key: key);
   @override
-  _MarkDownEditorState createState() => _MarkDownEditorState();
+  _MarkDownEditorState createState() => _MarkDownEditorState(controller);
 }
 
 class _MarkDownEditorState extends State<MarkDownEditor> {
-  final _textController = TextEditingController();
+  final TextEditingController controller;
+
+  _MarkDownEditorState(this.controller);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         MrkdownEditingField(
-          textController: _textController,
+          textController: controller,
           onChange: () {
             setState(() {});
           },
         ),
         MarkdownEditorButtons(
-          textEditingController: _textController,
+          textEditingController: controller,
           afterEditing: () {
             setState(
               () {},
@@ -30,7 +35,7 @@ class _MarkDownEditorState extends State<MarkDownEditor> {
           },
         ),
         Flexible(
-          child: MarkdownPreview(text: _textController.text),
+          child: MarkdownPreview(text: controller.text),
         ),
       ],
     );

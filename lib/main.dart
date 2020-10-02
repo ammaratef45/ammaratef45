@@ -1,5 +1,6 @@
 import 'package:ammaratef45Flutter/custom_widgets/error.dart';
 import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
+import 'package:ammaratef45Flutter/pages/add_project.dart';
 import 'package:ammaratef45Flutter/pages/admin.dart';
 import 'package:ammaratef45Flutter/pages/blog.dart';
 import 'package:ammaratef45Flutter/pages/home.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         AdminPage.ROUTE: (context) => AdminPage(),
         LoginPage.ROUTE: (context) => LoginPage(),
         BlogPage.ROUTE: (context) => BlogPage(),
+        AddProjectPage.ROUTE: (context) => AddProjectPage(),
       },
     );
   }
