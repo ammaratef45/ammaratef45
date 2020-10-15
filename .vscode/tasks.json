@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Launch-All",
+      "dependsOn": [
+        "Launch-iOS",
+        "Launch-Android",
+        "Launch-Web"
+      ]
+    },
+    {
+      "label": "Launch-iOS",
+      "type": "shell",
+      "command": "flutter run -d 'iPhone 11' "
+    },
+    {
+      "label": "Launch-Android",
+      "type": "shell",
+      "command": "flutter run -d ZY227GBGBQ"
+    },
+    {
+      "label": "Launch-Web",
+      "type": "shell",
+      "command": "flutter run -d web-server "
+    }
+  ]
+}

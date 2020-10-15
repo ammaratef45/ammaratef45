@@ -1,23 +1,25 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-        "name": "Android",
-        "request": "launch",
-        "type": "dart",
-        "deviceId": "android"
-    },
-    {
-        "name": "iPhone",
-        "request": "launch",
-        "type": "dart",
-        "deviceId": "iphone"
-    },
-    {
-      "name": "web",
-      "request": "launch",
-      "type": "dart",
-      "deviceId": "chrome"
-    }
-  ]
+      {
+          "name": "All",
+          "preLaunchTask": "Launch-All",
+          "type": "dart",
+      },
+      {
+          "name": "iOS",
+          "preLaunchTask": "Launch-iOS",
+          "type": "dart",
+      },
+      {
+          "name": "Android",
+          "preLaunchTask": "Launch-Android",
+          "type": "dart",
+      },
+      {
+          "name": "Web",
+          "preLaunchTask": "Launch-Web",
+          "type": "dart",
+      }
+  ],
 }

@@ -13,18 +13,21 @@ class AdminPage extends StatelessWidget {
     if (!authService.isLogged()) {
       Navigator.pushReplacementNamed(context, LoginPage.ROUTE);
     }
-    return Scaffold(
-      body: ProjectsStream(
-        onClick: (Project p) {
-          Navigator.pushNamed(context, AddProjectPage.ROUTE, arguments: p);
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, AddProjectPage.ROUTE);
-        },
-        icon: Icon(Icons.add),
-        label: Text('Add'),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: ProjectsStream(
+          onClick: (Project p) {
+            Navigator.pushNamed(context, AddProjectPage.ROUTE, arguments: p);
+          },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.pushNamed(context, AddProjectPage.ROUTE);
+          },
+          icon: Icon(Icons.add),
+          label: Text('Add'),
+        ),
       ),
     );
   }

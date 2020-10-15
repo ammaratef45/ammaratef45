@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -23,23 +24,25 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: FutureBuilder<FirebaseApp>(
-          future: _initialization,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Scaffold(
-                body: ErrorView(
-                  error: snapshot.error.toString(),
-                ),
-              );
-            }
-            if (!snapshot.hasData) {
-              return Scaffold(
-                body: LoadingView(),
-              );
-            }
-            return HomePage();
-          }),
+      home: SafeArea(
+        child: FutureBuilder<FirebaseApp>(
+            future: _initialization,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Scaffold(
+                  body: ErrorView(
+                    error: snapshot.error.toString(),
+                  ),
+                );
+              }
+              if (!snapshot.hasData) {
+                return Scaffold(
+                  body: LoadingView(),
+                );
+              }
+              return HomePage();
+            }),
+      ),
       routes: {
         ProjectsPage.ROUTE: (context) => ProjectsPage(),
         AdminPage.ROUTE: (context) => AdminPage(),

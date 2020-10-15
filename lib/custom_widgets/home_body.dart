@@ -1,8 +1,9 @@
-import 'package:universal_html/prefer_universal/js.dart' as js;
 import 'package:ammaratef45Flutter/custom_widgets/link_icon.dart';
 import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeBody extends StatelessWidget {
   final MyInfo myInfo;
@@ -55,30 +56,66 @@ class HomeBody extends StatelessWidget {
                     iconData: FontAwesomeIcons.facebook,
                     color: Color(0xff3b5998),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['https://www.facebook.com/ammaratef45'],
-                      );
+                      const href = 'https://www.facebook.com/ammaratef45';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                   LinkIcon(
                     iconData: FontAwesomeIcons.twitter,
                     color: Color(0xff55acee),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['https://twitter.com/ammaratef45'],
-                      );
+                      const href = 'https://twitter.com/ammaratef45';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                   LinkIcon(
                     iconData: FontAwesomeIcons.linkedin,
                     color: Color(0xff007bb5),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['https://www.linkedin.com/in/ammaratef45/'],
-                      );
+                      const href = 'https://www.linkedin.com/in/ammaratef45/';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                 ],
@@ -90,30 +127,66 @@ class HomeBody extends StatelessWidget {
                     iconData: FontAwesomeIcons.github,
                     color: Color(0xff000000),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['https://github.com/ammaratef45'],
-                      );
+                      const href = 'https://github.com/ammaratef45';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                   LinkIcon(
                     iconData: FontAwesomeIcons.instagram,
                     color: Color(0xff125688),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['https://www.instagram.com/ammar.atef45/'],
-                      );
+                      const href = 'https://www.instagram.com/ammar.atef45/';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                   LinkIcon(
                     iconData: FontAwesomeIcons.envelope,
                     color: Color(0xff865dae),
                     onPressed: () {
-                      js.context.callMethod(
-                        'open',
-                        ['mailto:ammar.atef45@gmail.com'],
-                      );
+                      const href = 'mailto:ammar.atef45@gmail.com';
+                      canLaunch(href).then((value) {
+                        if (value) {
+                          launch(href);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Couldn't open the URL",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
+                      });
                     },
                   ),
                 ],

@@ -11,6 +11,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double radius = 50;
     return Container(
       color: Colors.lightBlue,
       width: double.infinity,
@@ -24,13 +25,16 @@ class Header extends StatelessWidget {
             repeatPauseDuration: Duration(seconds: 2),
             startDelay: Duration(seconds: 1),
             child: Material(
-                elevation: 8.0,
-                shape: CircleBorder(),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey[100],
-                  child: Image.asset('assets/avatar.jpg'),
-                  radius: 50.0,
-                )),
+              elevation: 8.0,
+              shape: CircleBorder(),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey[100],
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(radius),
+                    child: Image.asset('assets/avatar.jpg')),
+                radius: radius,
+              ),
+            ),
           ),
           SelectableText(
             myInfo.name,

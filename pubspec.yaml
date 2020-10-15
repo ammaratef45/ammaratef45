@@ -17,8 +17,11 @@ dependencies:
   firebase_core: ^0.5.0
   cloud_firestore: ^0.14.0
   firebase_auth: ^0.18.1
-  flutter_markdown: ^0.4.4
-  universal_html: ^1.2.3
+  flutter_markdown_editor: ^1.0.0
+  url_launcher: ^5.7.2
+  fluttertoast: ^7.1.1
+  device_info: ^0.4.2+9
+  google_sign_in: ^4.5.1
 
 dev_dependencies:
   flutter_test:

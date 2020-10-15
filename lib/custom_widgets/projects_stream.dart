@@ -19,21 +19,23 @@ class ProjectsStream extends StatelessWidget {
             return ErrorView(error: snapshot.error.toString());
           if (!snapshot.hasData) return LoadingView();
           return SingleChildScrollView(
-            child: Wrap(
-              children: [
-                ...snapshot.data
-                    .map(
-                      (project) => ProjectCard(
-                        project: project,
-                        onClick: onClick == null
-                            ? null
-                            : () {
-                                Function.apply(onClick, [project]);
-                              },
-                      ),
-                    )
-                    .toList()
-              ],
+            child: Center(
+              child: Wrap(
+                children: [
+                  ...snapshot.data
+                      .map(
+                        (project) => ProjectCard(
+                          project: project,
+                          onClick: onClick == null
+                              ? null
+                              : () {
+                                  Function.apply(onClick, [project]);
+                                },
+                        ),
+                      )
+                      .toList()
+                ],
+              ),
             ),
           );
         });

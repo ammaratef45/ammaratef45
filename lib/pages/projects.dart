@@ -6,8 +6,11 @@ class ProjectsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ProjectsStream(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: ProjectsStream(),
+      ),
     );
   }
 }
