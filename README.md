@@ -14,7 +14,7 @@ I love building cool things and learn new stuff.
 [![github stats](https://github-readme-stats.vercel.app/api?username=ammaratef45&theme=radical)](https://github.com/ammaratef45)
 
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ammaratef45&theme=radical&hide=javascript,html,Jupyter+Notebook,c,&langs_count=8&layout=compact)](https://github.com/ammaratef45)
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ammaratef45&theme=radical&langs_count=9&layout=compact)](https://github.com/ammaratef45)
 
 [![wakatime stats](https://github-readme-stats.vercel.app/api/wakatime?username=ammaratef45&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
 
