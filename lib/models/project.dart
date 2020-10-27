@@ -14,4 +14,12 @@ class Project {
 
   Map<String, dynamic> get doc =>
       {NAME_KEY: name, DESC_KEY: description, IMAGE_KEY: image};
+
+  Project copyWithImage(String newImage) {
+    return Project._(id, name, description, newImage);
+  }
+
+  Project copyWithId(String newId) {
+    return Project._(newId, name, description, image);
+  }
 }

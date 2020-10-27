@@ -1,19 +1,21 @@
+import 'package:ammaratef45Flutter/custom_widgets/cards/article_card.dart';
 import 'package:ammaratef45Flutter/custom_widgets/error.dart';
 import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
-import 'package:ammaratef45Flutter/custom_widgets/project_card.dart';
-import 'package:ammaratef45Flutter/models/project.dart';
-import 'package:ammaratef45Flutter/services/project_service.dart';
+import 'package:ammaratef45Flutter/models/article.dart';
+import 'package:ammaratef45Flutter/services/articles_service.dart';
 import 'package:flutter/material.dart';
 
-class ProjectsStream extends StatelessWidget {
-  final ProjectsService projectsService = ProjectsService.instance;
-  final Function onClick;
+typedef ArticleClicked = Function(Article article);
 
-  ProjectsStream({Key key, this.onClick}) : super(key: key);
+class ArticleStream extends StatelessWidget {
+  final ArticlesService articlesService = ArticlesService.instance;
+  final ArticleClicked onClick;
+
+  ArticleStream({Key key, this.onClick}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Project>>(
-        stream: projectsService.getProjectsStream(),
+    return StreamBuilder<List<Article>>(
+        stream: articlesService.getArticlesStream(),
         builder: (context, snapshot) {
           if (snapshot.hasError)
             return ErrorView(error: snapshot.error.toString());
@@ -24,12 +26,12 @@ class ProjectsStream extends StatelessWidget {
                 children: [
                   ...snapshot.data
                       .map(
-                        (project) => ProjectCard(
-                          project: project,
+                        (article) => ArticleCard(
+                          article: article,
                           onClick: onClick == null
                               ? null
                               : () {
-                                  Function.apply(onClick, [project]);
+                                  onClick(article);
                                 },
                         ),
                       )

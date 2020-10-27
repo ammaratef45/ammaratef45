@@ -28,13 +28,16 @@ class ProjectsService {
     }
   }
 
-  Future<void> addProject(Project project) async {
+  Future<Project> addProject(Project project) async {
+    String id = project.id;
     if (project.id.isEmpty)
-      await _fireStore.collection(PROJECTS_COLLECTION).add(project.doc);
+      id = (await _fireStore.collection(PROJECTS_COLLECTION).add(project.doc))
+          .id;
     else
       await _fireStore
           .collection(PROJECTS_COLLECTION)
           .doc(project.id)
           .update(project.doc);
+    return project.copyWithId(id);
   }
 }

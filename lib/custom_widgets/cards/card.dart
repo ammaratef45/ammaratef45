@@ -1,20 +1,26 @@
-import 'package:ammaratef45Flutter/models/project.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_editor/flutter_markdown_editor.dart';
 
-class ProjectCard extends StatelessWidget {
-  final Project project;
+class MyCard extends StatelessWidget {
   final Function onClick;
-  const ProjectCard({
-    Key key,
-    this.project,
-    this.onClick,
-  }) : super(key: key);
+  final String imageUrl;
+  final String title;
+  final String previewText;
 
+  const MyCard({
+    Key key,
+    this.onClick,
+    @required this.imageUrl,
+    @required this.title,
+    @required this.previewText,
+  })  : assert(imageUrl != null),
+        assert(title != null),
+        assert(previewText != null),
+        super(key: key);
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = TextEditingController();
-    _controller.text = project.description;
+    _controller.text = previewText;
     MarkDownEditor _editor = MarkDownEditor(
       controller: _controller,
     );
@@ -34,7 +40,7 @@ class ProjectCard extends StatelessWidget {
                 child: InkWell(
                   onTap: onClick,
                   child: Image.network(
-                    project.image,
+                    imageUrl,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -47,7 +53,7 @@ class ProjectCard extends StatelessWidget {
                 color: Colors.white,
                 child: Center(
                   child: SelectableText(
-                    project.name,
+                    title,
                     style: TextStyle(
                       fontSize: 22,
                     ),

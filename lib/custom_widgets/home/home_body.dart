@@ -1,4 +1,4 @@
-import 'package:ammaratef45Flutter/custom_widgets/link_icon.dart';
+import 'package:ammaratef45Flutter/custom_widgets/home/link_icon.dart';
 import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';

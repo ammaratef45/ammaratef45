@@ -1,8 +1,8 @@
 import 'package:ammaratef45Flutter/custom_widgets/error.dart';
-import 'package:ammaratef45Flutter/custom_widgets/header.dart';
-import 'package:ammaratef45Flutter/custom_widgets/home_body.dart';
+import 'package:ammaratef45Flutter/custom_widgets/home/header.dart';
+import 'package:ammaratef45Flutter/custom_widgets/home/home_body.dart';
 import 'package:ammaratef45Flutter/custom_widgets/loading.dart';
-import 'package:ammaratef45Flutter/custom_widgets/menu_bar.dart';
+import 'package:ammaratef45Flutter/custom_widgets/home/menu_bar.dart';
 import 'package:ammaratef45Flutter/models/myinfo.dart';
 import 'package:ammaratef45Flutter/services/info_service.dart';
 import 'package:flutter/material.dart';
