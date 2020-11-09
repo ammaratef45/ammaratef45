@@ -1,4 +1,5 @@
 import 'package:ammaratef45Flutter/models/myinfo.dart';
+import 'package:animated_typing/animated_typing.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 
@@ -36,8 +37,8 @@ class Header extends StatelessWidget {
               ),
             ),
           ),
-          SelectableText(
-            myInfo.name,
+          AnimatedTyping(
+            text: myInfo.name,
             style: TextStyle(
               fontSize: 35,
               fontWeight: FontWeight.bold,
@@ -46,7 +47,7 @@ class Header extends StatelessWidget {
           SizedBox(
             height: 20,
           ),
-          SelectableText(myInfo.subtitle),
+          AnimatedTyping(text: myInfo.subtitle),
           SizedBox(
             height: 20,
           ),
