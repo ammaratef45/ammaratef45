@@ -26,7 +26,7 @@ jobs:
       - name: Deploy stack to AWS
         uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
         with:
-          name: wordpress-blog
+          name: wordpressBlog
           template: wordpressCfn.json
           parameter-overrides: "KeyName=wordpressKey,InstanceType=t2.small,DBName=${{ secrets.DB_NAME }},DBUser=${{ secrets.DB_USER }},DBPassword=${{ secrets.DB_PASSWORD }},DBRootPassword=${{ secrets.DB_PASSWORD }}"
           no-fail-on-empty-changeset: "1"
