@@ -16,9 +16,6 @@ I love building cool things and learn new stuff.
 
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ammaratef45&theme=radical&langs_count=9&layout=compact)](https://github.com/ammaratef45)
 
-[![wakatime stats](https://github-readme-stats.vercel.app/api/wakatime?username=ammaratef45&theme=radical)](https://github.com/ammaratef45)
-
-
 [![ReadMe Card](https://github-readme-stats.vercel.app/api/pin/?username=ammaratef45&repo=dart_stack&theme=radical)](https://github.com/ammaratef45/dart_stack)
 [![ReadMe Card](https://github-readme-stats.vercel.app/api/pin/?username=ammaratef45&repo=flutter_markdown_editor&theme=radical)](https://github.com/ammaratef45/flutter_markdown_editor)
 [![ReadMe Card](https://github-readme-stats.vercel.app/api/pin/?username=ammaratef45&repo=ammaratef45&theme=radical)](https://github.com/ammaratef45/ammaratef45)
