@@ -509,7 +509,8 @@
           {
             "LoadBalancerPort" : "443",
             "InstancePort" : "443",
-            "Protocol" : "HTTPS"
+            "Protocol" : "HTTPS",
+            "SSLCertificateId": "arn:aws:acm:us-east-1:835451110523:certificate/6126244d-52a9-4eff-b830-7411061dbcbe"
           }
         ],
         "HealthCheck" : {
