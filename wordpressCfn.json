@@ -344,7 +344,8 @@
                 "mysql57-server" : [],
                 "mysql57-devel"  : [],
                 "mysql57-libs"   : [],
-                "httpd24"        : []
+                "httpd24"        : [],
+                "mod24_ssl"      : []
               }
             },
             "sources" : {
