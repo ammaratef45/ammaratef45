@@ -28,6 +28,6 @@ jobs:
         with:
           name: WordpressBlog
           template: wordpressCfn.json
-          parameter-overrides: "KeyName=wordpressKey,InstanceType=t2.small,DBName=${{ secrets.DB_NAME }},DBUser=${{ secrets.DB_USER }},DBPassword=${{ secrets.DB_PASSWORD }},DBRootPassword=${{ secrets.DB_PASSWORD }}"
+          parameter-overrides: "KeyName=wordpressKey,DBName=${{ secrets.DB_NAME }},DBUser=${{ secrets.DB_USER }},DBPassword=${{ secrets.DB_PASSWORD }},DBRootPassword=${{ secrets.DB_PASSWORD }}"
           no-fail-on-empty-changeset: "1"
 
