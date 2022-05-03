@@ -253,8 +253,7 @@
             },
             "services" : {
               "sysvinit" : {
-                "httpd"  : { "enabled" : "true", "ensureRunning" : "true" },
-                "mysqld" : { "enabled" : "true", "ensureRunning" : "true" }
+                "httpd"  : { "enabled" : "true", "ensureRunning" : "true" }
               }
             }
           },
