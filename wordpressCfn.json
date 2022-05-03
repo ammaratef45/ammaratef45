@@ -215,12 +215,10 @@
                 "php73"          : [],
                 "php73-mysqlnd"  : [],
                 "mysql57"        : [],
-                "mysql57-server" : [],
                 "mysql57-devel"  : [],
                 "mysql57-libs"   : [],
                 "httpd24"        : [],
-                "mod24_ssl"      : [],
-                "links"          : []
+                "mod24_ssl"      : []
               }
             },
             "sources" : {
