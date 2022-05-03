@@ -14,8 +14,8 @@
     "InstanceType" : {
       "Description" : "WebServer EC2 instance type",
       "Type" : "String",
-      "Default" : "t2.small",
-      "AllowedValues" : ["t2.small"],
+      "Default" : "t2.micro",
+      "AllowedValues" : ["t2.small", "t2.micro"],
       "ConstraintDescription" : "must be a valid EC2 instance type."
     },
 
@@ -62,10 +62,12 @@
 
   "Mappings" : {
     "AWSInstanceType2Arch" : {
+      "t2.micro"    : { "Arch" : "HVM64"  },
       "t2.small"    : { "Arch" : "HVM64"  }
     },
 
     "AWSInstanceType2NATArch" : {
+      "t2.micro"    : { "Arch" : "NATHVM64"  },
       "t2.small"    : { "Arch" : "NATHVM64"  }
     },
     "AWSRegionArch2AMI" : {
