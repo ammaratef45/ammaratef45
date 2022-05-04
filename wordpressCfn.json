@@ -352,7 +352,7 @@
       "Properties" : {
         "AvailabilityZones" : { "Fn::GetAZs" : "" },
         "CrossZone" : "true",
-        "SecurityGroups": [{"Ref": "LoadBalancerSecurityGroup"}],
+        "SecurityGroups": [{ "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }],
         "Listeners" : [
           {
             "LoadBalancerPort" : "80",
