@@ -200,7 +200,7 @@
                 "mysql57-devel"  : [],
                 "mysql57-libs"   : [],
                 "httpd24"        : [],
-                "mod24_ssl"      : []
+                "mod_ssl"      : []
               }
             },
             "sources" : {
