@@ -191,15 +191,12 @@
             }
           },
           "install_wordpress" : {
-            "packages" : {
-              "yum" : {
-                "php": [],
-                "php-mysqlnd": [],
-                "mariadb": [],
-                "mariadb-devel": [],
-                "mariadb-libs": [],
-                "httpd": [],
-                "mod_ssl": []
+            "commands": {
+              "01_enable_php_74": {
+                "command": "amazon-linux-extras enable php7.4"
+              },
+              "02_install_packages": {
+                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl"
               }
             },
             "sources" : {
