@@ -194,7 +194,7 @@
           "install_wordpress" : {
             "packages" : {
               "yum" : {
-                "php7.2"          : [],
+                "php"          : [],
                 "php-mysqlnd"  : [],
                 "mariadb"        : [],
                 "mariadb-devel"  : [],
