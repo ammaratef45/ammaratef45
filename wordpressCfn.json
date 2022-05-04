@@ -19,6 +19,12 @@
       "ConstraintDescription" : "must be a valid EC2 instance type."
     },
 
+    "InstanceAmi" : {
+      "Description": "AMI of the instance",
+      "Type": "String",
+      "Default": "ami-0fda7ac38514d18ef"
+    },
+
     "DBName" : {
       "Default": "wordpressdb",
       "Description" : "The WordPress database name",
@@ -48,22 +54,6 @@
       "AllowedPattern" : "[a-zA-Z0-9]*",
       "ConstraintDescription" : "must contain only alphanumeric characters."
     }
-  },
-
-  "Mappings" : {
-    "AWSInstanceType2Arch" : {
-      "t2.micro"    : { "Arch" : "HVM64"  },
-      "t2.small"    : { "Arch" : "HVM64"  }
-    },
-
-    "AWSInstanceType2NATArch" : {
-      "t2.micro"    : { "Arch" : "NATHVM64"  },
-      "t2.small"    : { "Arch" : "NATHVM64"  }
-    },
-    "AWSRegionArch2AMI" : {
-      "us-east-1"   : {"HVM64" : "ami-032930428bf1abbff", "HVMG2" : "ami-0aeb704d503081ea6"}
-    }
-
   },
 
   "Resources" : {
@@ -267,8 +257,7 @@
         }
       },
       "Properties": {
-        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+        "ImageId"        : { "Ref" : "InstanceAmi" },
         "InstanceType"   : { "Ref" : "InstanceType" },
         "SecurityGroups" : [ {"Ref" : "WebServerSecurityGroup"} ],
         "KeyName"        : { "Ref" : "KeyName" },
