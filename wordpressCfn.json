@@ -25,6 +25,12 @@
       "Default": "ami-0fda7ac38514d18ef"
     },
 
+    "VpcId": {
+      "Description": "VPC ID",
+      "Type": "String",
+      "Default": "vpc-098d5d6d1fc720f01"
+    },
+
     "DBName" : {
       "Default": "wordpressdb",
       "Description" : "The WordPress database name",
@@ -133,7 +139,7 @@
         "LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
         "MinSize" : "1",
         "MaxSize" : "3",
-        "LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ],
+        "TargetGroupARNs": [{ "Ref": "TargetGroup" }],
         "NotificationConfiguration" : {
           "TopicARN" : { "Ref" : "NotificationTopic" },
           "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH",
@@ -347,32 +353,124 @@
          "ComparisonOperator": "LessThanThreshold"
        }
      },
-     "ElasticLoadBalancer" : {
-      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+    "subnet-1" : {
+      "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "AvailabilityZones" : { "Fn::GetAZs" : "" },
-        "CrossZone" : "true",
-        "SecurityGroups": [{ "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }],
-        "Listeners" : [
-          {
-            "LoadBalancerPort" : "80",
-            "InstancePort" : "80",
-            "Protocol" : "HTTP"
-          },
-          {
-            "LoadBalancerPort" : "443",
-            "InstancePort" : "443",
-            "Protocol" : "HTTPS",
-            "SSLCertificateId": "arn:aws:acm:us-east-1:835451110523:certificate/00527141-a7f7-4dac-a199-cde2006aa539"
-          }
-        ],
-        "HealthCheck" : {
-          "Target" : "HTTP:80/health.html",
-          "HealthyThreshold" : "3",
-          "UnhealthyThreshold" : "5",
-          "Interval" : "30",
-          "Timeout" : "5"
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1a",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "subnet-2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1b",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "subnet-3" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1c",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "subnet-4" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1d",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "subnet-5" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1e",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "subnet-6" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VpcId" },
+        "CidrBlock" : "10.0.0.0/24",
+        "AvailabilityZone" : "us-east-1f",
+        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+      }
+    },
+    "ElasticLoadBalancer" :{
+      "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties" : {
+          "SecurityGroups" : [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
+          "Subnets" : [
+            {"Ref": "subnet-1"},
+            {"Ref": "subnet-2"},
+            {"Ref": "subnet-3"},
+            {"Ref": "subnet-4"},
+            {"Ref": "subnet-5"},
+            {"Ref": "subnet-6"}
+          ]
         }
+    },
+    "HTTPSListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "TargetGroup" }
+        }],
+        "LoadBalancerArn": { "Ref": "ElasticLoadBalancer" },
+        "Port": 443,
+        "Protocol": "HTTPS"
+      }
+    },
+    "HTTPListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [{
+          "Type": "redirect",
+            "RedirectConfig": {
+              "Protocol": "HTTPS",
+              "Port": 443,
+              "Host": "#{host}",
+              "Path": "/#{path}",
+              "Query": "#{query}",
+              "StatusCode": "HTTP_301"
+            }
+        }],
+        "LoadBalancerArn": { "Ref": "ElasticLoadBalancer" },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    },
+    "TargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "Name": { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "TargetGroup" ] ] },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "VpcId": { "Ref": "VpcId" },
+        "UnhealthyThresholdCount": 5,
+        "HealthyThresholdCount": 3,
+        "HealthCheckPath": "/health.html",
+        "HealthCheckPort": 80
+      },
+      "DependsOn": [ "ElasticLoadBalancer" ]
+    },
+    "Certificate": {
+      "Type" : "AWS::ElasticLoadBalancingV2::ListenerCertificate",
+      "Properties" : {
+        "Certificates": [ "arn:aws:acm:us-east-1:835451110523:certificate/00527141-a7f7-4dac-a199-cde2006aa539" ],
+        "ListenerArn": {"Ref": "HTTPSListener"}
       }
     }
   },
