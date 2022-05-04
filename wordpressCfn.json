@@ -190,17 +190,16 @@
               }
             }
           },
-
           "install_wordpress" : {
             "packages" : {
               "yum" : {
-                "php"          : [],
-                "php-mysqlnd"  : [],
-                "mariadb"        : [],
-                "mariadb-devel"  : [],
-                "mariadb-libs"   : [],
-                "httpd24"        : [],
-                "mod_ssl"      : []
+                "php": [],
+                "php-mysqlnd": [],
+                "mariadb": [],
+                "mariadb-devel": [],
+                "mariadb-libs": [],
+                "httpd": [],
+                "mod_ssl": []
               }
             },
             "sources" : {
