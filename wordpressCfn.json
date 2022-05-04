@@ -196,9 +196,9 @@
               "yum" : {
                 "php73"          : [],
                 "php73-mysqlnd"  : [],
-                "mysql57"        : [],
+                "mariadb"        : [],
                 "mariadb-devel"  : [],
-                "mysql57-libs"   : [],
+                "mariadb-libs"   : [],
                 "httpd24"        : [],
                 "mod_ssl"      : []
               }
