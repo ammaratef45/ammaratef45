@@ -93,6 +93,16 @@
         }]
       }
     },
+    "LoadBalancerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Open https and https for access",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
+      ]
+      }
+    },
     "WebServerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -342,6 +352,7 @@
       "Properties" : {
         "AvailabilityZones" : { "Fn::GetAZs" : "" },
         "CrossZone" : "true",
+        "SecurityGroups": [{"Ref": "LoadBalancerSecurityGroup"}],
         "Listeners" : [
           {
             "LoadBalancerPort" : "80",
