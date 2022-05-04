@@ -197,7 +197,7 @@
                 "php73"          : [],
                 "php73-mysqlnd"  : [],
                 "mysql57"        : [],
-                "mysql57-devel"  : [],
+                "mariadb-devel"  : [],
                 "mysql57-libs"   : [],
                 "httpd24"        : [],
                 "mod_ssl"      : []
