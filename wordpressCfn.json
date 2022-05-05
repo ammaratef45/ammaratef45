@@ -409,7 +409,8 @@
         "UnhealthyThresholdCount": 5,
         "HealthyThresholdCount": 3,
         "HealthCheckPath": "/health.html",
-        "HealthCheckPort": 80
+        "HealthCheckPort": 80,
+        "HealthCheckProtocol": "HTTP"
       },
       "DependsOn": [ "ApplicationLoadBalancer" ]
     }
