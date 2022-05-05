@@ -355,7 +355,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.32.0/20",
         "AvailabilityZone": "us-east-1a",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
@@ -364,7 +364,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.0.0/20",
         "AvailabilityZone": "us-east-1b",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
@@ -373,7 +373,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.80.0/20",
         "AvailabilityZone": "us-east-1c",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
@@ -382,7 +382,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.16.0/20",
         "AvailabilityZone": "us-east-1d",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
@@ -391,7 +391,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.48.0/20",
         "AvailabilityZone": "us-east-1e",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
@@ -400,7 +400,7 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "10.0.0.0/24",
+        "CidrBlock": "172.31.64.0/20",
         "AvailabilityZone": "us-east-1f",
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
