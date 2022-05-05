@@ -118,13 +118,13 @@
             "IpProtocol" : "tcp",
             "FromPort" : 80,
             "ToPort" : 80,
-            "SourceSecurityGroupId" : {"Ref" : "LoadBalancerSecurityGroup"}
+            "SourceSecurityGroupId" : { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }
           },
           {
             "IpProtocol" : "tcp",
             "FromPort" : 443,
             "ToPort" : 443,
-            "SourceSecurityGroupId" : {"Ref" : "LoadBalancerSecurityGroup"}
+            "SourceSecurityGroupId" : { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }
           },
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
         ]
