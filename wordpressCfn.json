@@ -351,71 +351,17 @@
          "ComparisonOperator": "LessThanThreshold"
        }
      },
-    "subnet1": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.32.0/20",
-        "AvailabilityZone": "us-east-1a",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
-    "subnet2": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.0.0/20",
-        "AvailabilityZone": "us-east-1b",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
-    "subnet3": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.80.0/20",
-        "AvailabilityZone": "us-east-1c",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
-    "subnet4": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.16.0/20",
-        "AvailabilityZone": "us-east-1d",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
-    "subnet5": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.48.0/20",
-        "AvailabilityZone": "us-east-1e",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
-    "subnet6": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": { "Ref" : "VpcId" },
-        "CidrBlock": "172.31.64.0/20",
-        "AvailabilityZone": "us-east-1f",
-        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
-      }
-    },
     "ApplicationLoadBalancer": {
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
       "Properties": {
           "SecurityGroups": [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
           "Subnets": [
-            {"Ref": "subnet1"},
-            {"Ref": "subnet2"},
-            {"Ref": "subnet3"},
-            {"Ref": "subnet4"},
-            {"Ref": "subnet5"},
-            {"Ref": "subnet6"}
+            "subnet-07c6ae5cd5bbe52f8",
+            "subnet-0f76be8a4f664b079",
+            "subnet-03dc815639f4113f1",
+            "subnet-0346d8ebb5eded80e",
+            "subnet-05df740366c23a722",
+            "subnet-09c0d0d6e5196018e"
           ]
         }
     },
