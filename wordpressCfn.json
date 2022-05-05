@@ -405,7 +405,7 @@
         "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "ElasticLoadBalancer": {
+    "ApplicationLoadBalancer": {
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
       "Properties": {
           "SecurityGroups": [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
@@ -426,7 +426,7 @@
           "Type": "forward",
           "TargetGroupArn": { "Ref": "TargetGroup" }
         }],
-        "LoadBalancerArn": { "Ref": "ElasticLoadBalancer" },
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
         "Port": 443,
         "Protocol": "HTTPS"
       }
@@ -445,7 +445,7 @@
               "StatusCode": "HTTP_301"
             }
         }],
-        "LoadBalancerArn": { "Ref": "ElasticLoadBalancer" },
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
         "Port": 80,
         "Protocol": "HTTP"
       }
@@ -462,7 +462,7 @@
         "HealthCheckPath": "/health.html",
         "HealthCheckPort": 80
       },
-      "DependsOn": [ "ElasticLoadBalancer" ]
+      "DependsOn": [ "ApplicationLoadBalancer" ]
     },
     "Certificate": {
       "Type" : "AWS::ElasticLoadBalancingV2::ListenerCertificate",
@@ -476,7 +476,7 @@
   "Outputs" : {
     "URL" : {
       "Description" : "The URL of the website",
-      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}]]}
+      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ApplicationLoadBalancer", "DNSName" ]}]]}
     }
   }
 }
