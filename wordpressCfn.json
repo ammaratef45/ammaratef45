@@ -125,8 +125,8 @@
             "IpProtocol" : "tcp",
             "FromPort" : 443,
             "ToPort" : 443,
-            "SourceSecurityGroupOwnerId" : {"Fn::GetAtt" : ["ElasticLoadBalancer", "SourceSecurityGroup.OwnerAlias"]},
-            "SourceSecurityGroupName" : {"Fn::GetAtt" : ["ElasticLoadBalancer", "SourceSecurityGroup.GroupName"]}
+            "SourceSecurityGroupOwnerId" : {"Fn::GetAtt" : ["ElasticLoadBalancer", "SecurityGroups.OwnerAlias"]},
+            "SourceSecurityGroupName" : {"Fn::GetAtt" : ["ElasticLoadBalancer", "SecurityGroups.GroupName"]}
           },
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
         ]
