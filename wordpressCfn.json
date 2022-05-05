@@ -353,71 +353,71 @@
          "ComparisonOperator": "LessThanThreshold"
        }
      },
-    "subnet-1" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1a",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1a",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "subnet-2" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1b",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1b",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "subnet-3" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1c",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1c",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "subnet-4" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1d",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet4": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1d",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "subnet-5" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1e",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet5": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1e",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "subnet-6" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "VpcId" },
-        "CidrBlock" : "10.0.0.0/24",
-        "AvailabilityZone" : "us-east-1f",
-        "Tags" : [ { "Key" : "stack", "Value" : "production" } ]
+    "subnet6": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref" : "VpcId" },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1f",
+        "Tags": [ { "Key" : "stack", "Value" : "production" } ]
       }
     },
-    "ElasticLoadBalancer" :{
-      "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
-      "Properties" : {
-          "SecurityGroups" : [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
-          "Subnets" : [
-            {"Ref": "subnet-1"},
-            {"Ref": "subnet-2"},
-            {"Ref": "subnet-3"},
-            {"Ref": "subnet-4"},
-            {"Ref": "subnet-5"},
-            {"Ref": "subnet-6"}
+    "ElasticLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+          "SecurityGroups": [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
+          "Subnets": [
+            {"Ref": "subnet1"},
+            {"Ref": "subnet2"},
+            {"Ref": "subnet3"},
+            {"Ref": "subnet4"},
+            {"Ref": "subnet5"},
+            {"Ref": "subnet6"}
           ]
         }
     },
