@@ -2,6 +2,11 @@
 
 ![cfn workflow](https://github.com/ammaratef45/ammaratef45/actions/workflows/cfn.yml/badge.svg)
 [![ammaratef45](https://komarev.com/ghpvc/?username=ammaratef45)](https://komarev.com/ghpvc/?username=ammaratef45)
+![website-status](https://badgen.net/uptime-robot/status/m791661478-b8a707cde8f18d852d02d601)
+![day-uptime](https://badgen.net/uptime-robot/day/m791661478-b8a707cde8f18d852d02d601)
+![week-uptime](https://badgen.net/uptime-robot/week/m791661478-b8a707cde8f18d852d02d601)
+![month-uptime](https://badgen.net/uptime-robot/month/m791661478-b8a707cde8f18d852d02d601)
+![website-response-time](https://badgen.net/uptime-robot/response/m791661478-b8a707cde8f18d852d02d601)
 
 This is my username, I've a personal website you can visit at [ammaratef45.com](http://www.ammaratef45.com)
 
