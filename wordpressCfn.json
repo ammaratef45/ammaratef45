@@ -54,7 +54,7 @@
       "AllowedPattern" : "[a-zA-Z0-9]*",
       "ConstraintDescription" : "must contain only alphanumeric characters."
     },
-    "AKISMET_KEY": {
+    "AkismetKey": {
       "NoEcho": "true",
       "Description" : "The AKISMET API KEY",
       "Type": "String"
