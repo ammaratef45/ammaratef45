@@ -209,7 +209,7 @@
                 "command": "amazon-linux-extras enable php7.4"
               },
               "02_install_packages": {
-                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl"
+                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl php-dom php-imagick php-mbstring php-intl"
               }
             },
             "sources" : {
@@ -228,7 +228,9 @@
                   "source /usr/bin/wp-completion.bash\n",
                   "wp plugin activate akismet\n",
                   "wp plugin update akismet\n",
-                  "wp plugin activate hello\n"
+                  "wp plugin activate hello\n",
+                  "wp theme delete twentytwenty\n",
+                  "wp theme delete twentytwentyone\n"
                 ]]},
                 "mode"  : "000500",
                 "owner" : "root",
