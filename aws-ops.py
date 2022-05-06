@@ -32,6 +32,15 @@ def print_instance_ids():
     for instance in reservation['Instances']:
       print(instance['InstanceId'])
 
+def terminate_instance(instance_id):
+  ec2.terminate_instances(
+    InstanceIds=[instance_id]
+  )
+
+def terminate_instance_prompt():
+  instanceId = input('Enter instance ID:')
+  terminate_instance(instanceId)
+
 def change_desired_capacity(new_capacity):
   autoscaling.set_desired_capacity(
     AutoScalingGroupName=AUTO_SCALING_GROUP_NAME,
@@ -65,7 +74,8 @@ commands = {
   '0': Command('Change desired capacity to 2', change_capacity_to_2),
   '1': Command('print ssh command for running hosts', print_ssh_command),
   '2': Command('print cfn status', get_cfn_stack_status),
-  '3': Command('print instance Ids', print_instance_ids)
+  '3': Command('print instance Ids', print_instance_ids),
+  '4': Command('Terminate an EC2 Instance', terminate_instance_prompt)
 }
 
 if __name__=='__main__':
