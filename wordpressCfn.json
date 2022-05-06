@@ -1,37 +1,33 @@
 {
-  "AWSTemplateFormatVersion" : "2010-09-09",
+  "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description" : "AWS CloudFormation WordPress.",
+  "Description": "AWS CloudFormation WordPress.",
 
-  "Parameters" : {
-
+  "Parameters": {
     "KeyName": {
       "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
       "Type": "AWS::EC2::KeyPair::KeyName",
-      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
+      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair.",
+      "Default": "wordpressKey"
     },
-
-    "InstanceType" : {
+    "InstanceType": {
       "Description" : "WebServer EC2 instance type",
       "Type" : "String",
       "Default" : "t2.micro",
       "AllowedValues" : ["t2.small", "t2.micro"],
       "ConstraintDescription" : "must be a valid EC2 instance type."
     },
-
-    "InstanceAmi" : {
+    "InstanceAmi": {
       "Description": "AMI of the instance",
       "Type": "String",
       "Default": "ami-0fda7ac38514d18ef"
     },
-
     "VpcId": {
       "Description": "VPC ID",
       "Type": "String",
       "Default": "vpc-098d5d6d1fc720f01"
     },
-
-    "DBName" : {
+    "DBName": {
       "Default": "wordpressdb",
       "Description" : "The WordPress database name",
       "Type": "String",
@@ -40,8 +36,7 @@
       "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
       "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
     },
-
-    "DBUser" : {
+    "DBUser": {
       "NoEcho": "true",
       "Description" : "The WordPress database admin account username",
       "Type": "String",
@@ -50,8 +45,7 @@
       "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
       "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
     },
-
-    "DBPassword" : {
+    "DBPassword": {
       "NoEcho": "true",
       "Description" : "The WordPress database admin account password",
       "Type": "String",
@@ -59,6 +53,11 @@
       "MaxLength": "41",
       "AllowedPattern" : "[a-zA-Z0-9]*",
       "ConstraintDescription" : "must contain only alphanumeric characters."
+    },
+    "AKISMET_KEY": {
+      "NoEcho": "true",
+      "Description" : "The AKISMET API KEY",
+      "Type": "String"
     }
   },
 
@@ -216,42 +215,50 @@
             "sources" : {
               "/var/www/html" : "http://wordpress.org/latest.tar.gz"
             },
-            "files" : {
-              "/tmp/setup.mysql" : {
-                "content" : { "Fn::Join" : ["", [
-                  "CREATE DATABASE ", { "Ref" : "DBName" }, ";\n",
-                  "CREATE USER '", { "Ref" : "DBUser" }, "'@'localhost' IDENTIFIED BY '", { "Ref" : "DBPassword" }, "';\n",
-                  "GRANT ALL ON ", { "Ref" : "DBName" }, ".* TO '", { "Ref" : "DBUser" }, "'@'localhost';\n",
-                  "FLUSH PRIVILEGES;\n"
+            "files": {
+              "/tmp/wp-cli": {
+                "content": { "Fn::Join" : ["", [
+                  "#!/bin/bash -xe\n",
+                  "curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar\n",
+                  "chmod +x wp-cli.phar\n",
+                  "mv wp-cli.phar /usr/bin/wp\n",
+                  "wp cli update\n",
+                  "curl -O https://raw.githubusercontent.com/wp-cli/wp-cli/v2.6.0/utils/wp-completion.bash\n",
+                  "mv wp-completion.bash /usr/bin/\n",
+                  "source /usr/bin/wp-completion.bash\n",
+                  "wp plugin activate akismet\n",
+                  "wp plugin update akismet\n",
+                  "wp plugin activate hello\n"
                 ]]},
-                "mode"  : "000400",
+                "mode"  : "000500",
                 "owner" : "root",
                 "group" : "root"
               },
 
-              "/tmp/create-wp-config" : {
-                "content" : { "Fn::Join" : [ "", [
+              "/tmp/create-wp-config": {
+                "content": { "Fn::Join": [ "", [
                   "#!/bin/bash -xe\n",
                   "cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php\n",
                   "sed -i \"s/'database_name_here'/'",{ "Ref" : "DBName" }, "'/g\" wp-config.php\n",
                   "sed -i \"s/'username_here'/'",{ "Ref" : "DBUser" }, "'/g\" wp-config.php\n",
                   "sed -i \"s/'password_here'/'",{ "Ref" : "DBPassword" }, "'/g\" wp-config.php\n",
-                  "sed -i \"s/'localhost'/'",{ "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]}, "'/g\" wp-config.php\n"
+                  "sed -i \"s/'localhost'/'",{ "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]}, "'/g\" wp-config.php\n",
+                  "sed -i \"/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','",{ "Ref" : "AKISMET_KEY" }, "');\" wp-config.php\n"
                 ]]},
                 "mode" : "000500",
                 "owner" : "root",
                 "group" : "root"
               }
             },
-            "services" : {
-              "sysvinit" : {
-                "httpd"  : { "enabled" : "true", "ensureRunning" : "true" }
+            "services": {
+              "sysvinit": {
+                "httpd": { "enabled" : "true", "ensureRunning" : "true" }
               }
             }
           },
 
-          "configure_wordpress" : {
-            "commands" : {
+          "configure_wordpress": {
+            "commands": {
               "01_configure_wordpress" : {
                 "command" : "/tmp/create-wp-config",
                 "cwd" : "/var/www/html/wordpress"
@@ -261,7 +268,11 @@
               },
               "03_create_health_page": {
                 "command": "echo \"Instance is healthy\" >> /var/www/html/health.html"
-            }
+              },
+              "04_do_wp_cli_stuff": {
+                "command": "/tmp/wp-cli",
+                "cwd": "/var/www/html"
+              }
             }
           }
         }
