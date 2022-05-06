@@ -8,17 +8,9 @@ autoscaling = boto3.client('autoscaling')
 ec2 = boto3.client('ec2')
 cloudformation = boto3.client('cloudformation')
 
-def change_desired_capacity(new_capacity):
-  autoscaling.set_desired_capacity(
-    AutoScalingGroupName=AUTO_SCALING_GROUP_NAME,
-    DesiredCapacity=new_capacity,
-  )
 
-def change_capacity_to_2():
-  change_desired_capacity(2)
-
-def print_ssh_command():
-  instances = ec2.describe_instances(
+def instances():
+  return ec2.describe_instances(
     Filters=[
       {
         'Name': 'key-name',
@@ -34,7 +26,23 @@ def print_ssh_command():
       }
     ]
   )
-  for reservation in instances['Reservations']:
+
+def print_instance_ids():
+  for reservation in instances()['Reservations']:
+    for instance in reservation['Instances']:
+      print(instance['InstanceId'])
+
+def change_desired_capacity(new_capacity):
+  autoscaling.set_desired_capacity(
+    AutoScalingGroupName=AUTO_SCALING_GROUP_NAME,
+    DesiredCapacity=new_capacity,
+  )
+
+def change_capacity_to_2():
+  change_desired_capacity(2)
+
+def print_ssh_command():
+  for reservation in instances()['Reservations']:
     for instance in reservation['Instances']:
       print('ssh -i {}.pem ec2-user@{}'.format(KEY_NAME, instance['PublicDnsName']))
 
@@ -56,7 +64,8 @@ class Command:
 commands = {
   '0': Command('Change desired capacity to 2', change_capacity_to_2),
   '1': Command('print ssh command for running hosts', print_ssh_command),
-  '2': Command('print cfn status', get_cfn_stack_status)
+  '2': Command('print cfn status', get_cfn_stack_status),
+  '3': Command('print instance Ids', print_instance_ids)
 }
 
 if __name__=='__main__':
