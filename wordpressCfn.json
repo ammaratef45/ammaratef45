@@ -246,7 +246,8 @@
                   "sed -i \"s/'password_here'/'",{ "Ref" : "DBPassword" }, "'/g\" wp-config.php\n",
                   "sed -i \"s/'localhost'/'",{ "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]}, "'/g\" wp-config.php\n",
                   "sed -i \"/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','",{ "Ref" : "AkismetKey" }, "');\" wp-config.php\n",
-                  "sed -i \"s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g\" /etc/httpd/conf/httpd.conf "
+                  "sed -i \"s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g\" /etc/httpd/conf/httpd.conf",
+                  "service httpd restart"
                 ]]},
                 "mode" : "000500",
                 "owner" : "root",
