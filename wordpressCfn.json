@@ -20,7 +20,7 @@
     "InstanceAmi": {
       "Description": "AMI of the instance",
       "Type": "String",
-      "Default": "ami-0fda7ac38514d18ef"
+      "Default": "ami-090fa75af13c156b4"
     },
     "VpcId": {
       "Description": "VPC ID",
@@ -130,12 +130,13 @@
       }
     },
     "WebServerGroup" : {
-      "Type" : "AWS::AutoScaling::AutoScalingGroup",
-      "Properties" : {
-        "AvailabilityZones" : { "Fn::GetAZs" : ""},
-        "LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
-        "MinSize" : "1",
-        "MaxSize" : "3",
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": { "Fn::GetAZs" : ""},
+        "LaunchConfigurationName": { "Ref" : "LaunchConfig" },
+        "MinSize": "1",
+        "MaxSize": "3",
+        "TerminationPolicies": ["OldestInstance"],
         "TargetGroupARNs": [{ "Ref": "TargetGroup" }],
         "NotificationConfiguration" : {
           "TopicARN" : { "Ref" : "NotificationTopic" },
@@ -209,7 +210,11 @@
                 "command": "amazon-linux-extras enable php7.4"
               },
               "02_install_packages": {
-                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl php-dom php-imagick php-mbstring php-intl"
+                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl php-dom php-imagick php-mbstring php-intl ruby"
+              },
+              "03_install_code_deploy": {
+                "command": "/tmp/install-code-deploy",
+                "cwd": "/tmp"
               }
             },
             "sources" : {
@@ -236,7 +241,6 @@
                 "owner" : "root",
                 "group" : "root"
               },
-
               "/tmp/create-wp-config": {
                 "content": { "Fn::Join": [ "", [
                   "#!/bin/bash -xe\n",
@@ -248,6 +252,17 @@
                   "sed -i \"/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','",{ "Ref" : "AkismetKey" }, "');\" wp-config.php\n",
                   "sed -i \"s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g\" /etc/httpd/conf/httpd.conf\n",
                   "service httpd restart"
+                ]]},
+                "mode" : "000500",
+                "owner" : "root",
+                "group" : "root"
+              },
+              "/tmp/install-code-deploy": {
+                "content": { "Fn::Join": ["", [
+                  "#!/bin/bash -xe\n",
+                  "wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install\n",
+                  "chmod +x install\n",
+                  "./install auto"
                 ]]},
                 "mode" : "000500",
                 "owner" : "root",
@@ -264,8 +279,8 @@
           "configure_wordpress": {
             "commands": {
               "01_configure_wordpress" : {
-                "command" : "/tmp/create-wp-config",
-                "cwd" : "/var/www/html/wordpress"
+                "command": "/tmp/create-wp-config",
+                "cwd": "/var/www/html/wordpress"
               },
               "02_move_website": {
                   "command": "mv /var/www/html/wordpress/* /var/www/html"
@@ -282,11 +297,12 @@
         }
       },
       "Properties": {
-        "ImageId"        : { "Ref" : "InstanceAmi" },
-        "InstanceType"   : { "Ref" : "InstanceType" },
-        "SecurityGroups" : [ {"Ref" : "WebServerSecurityGroup"} ],
-        "KeyName"        : { "Ref" : "KeyName" },
-        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+        "ImageId": { "Ref": "InstanceAmi" },
+        "IamInstanceProfile": {"Ref": "WebServerInstanceProfile"},
+        "InstanceType": { "Ref": "InstanceType" },
+        "SecurityGroups": [ {"Ref": "WebServerSecurityGroup"} ],
+        "KeyName": { "Ref": "KeyName" },
+        "UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
                        "#!/bin/bash -xe\n",
                        "yum update -y aws-cfn-bootstrap\n",
 
@@ -307,6 +323,12 @@
           "Timeout" : "PT15M"
         }
       }
+    },
+    "WebServerInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties" : {
+          "Roles" : [{"Ref": "WebServerRole"}]
+        }
     },
     "WebServerScaleUpPolicy" : {
       "Type" : "AWS::AutoScaling::ScalingPolicy",
@@ -465,6 +487,26 @@
             }
           }
         ]
+      }
+    },
+    "WebServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com",
+                  "codedeploy.amazonaws.com"
+                ]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        }
       }
     },
     "DeploymentGroupWP": {
