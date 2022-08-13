@@ -428,13 +428,60 @@
         "HealthCheckProtocol": "HTTP"
       },
       "DependsOn": [ "ApplicationLoadBalancer" ]
+    },
+    "CodeDeployApp": {
+      "Type": "AWS::CodeDeploy::Application"
+    },
+    "CodeDeployRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["codedeploy.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "allow-autoscaling",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:*",
+                    "autoscaling:*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DeploymentGroupWP": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "Properties": {
+        "ApplicationName": {"Ref": "CodeDeployApp"},
+        "AutoScalingGroups": [{"Ref": "WebServerGroup"}],
+        "DeploymentConfigName": "CodeDeployDefault.HalfAtATime",
+        "ServiceRoleArn": { "Fn::GetAtt": ["CodeDeployRole", "Arn"]}
+      }
     }
   },
 
-  "Outputs" : {
-    "URL" : {
-      "Description" : "The URL of the website",
-      "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ApplicationLoadBalancer", "DNSName" ]}]]}
+  "Outputs": {
+    "URL": {
+      "Description": "The URL of the website",
+      "Value": {"Fn::Join": ["", ["http://", {"Fn::GetAtt": ["ApplicationLoadBalancer", "DNSName"]}]]}
     }
   }
 }
