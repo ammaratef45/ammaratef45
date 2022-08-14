@@ -6,7 +6,7 @@ files:
     destination: /var/www/html/scripts
 hooks:
   BeforeInstall:
-    - location: scripts/test.sh
+    - location: scripts/install-packages.sh
       timeout: 300
       runas: root
   AfterInstall:
@@ -14,10 +14,10 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/test.sh
+    - location: scripts/install-wp.sh
       timeout: 300
       runas: root
   ApplicationStop:
-    - location: scripts/test.sh
+    - location: scripts/uninstall.sh
       timeout: 300
       runas: root

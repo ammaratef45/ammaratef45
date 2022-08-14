@@ -167,7 +167,7 @@
       "Metadata" : {
         "AWS::CloudFormation::Init" : {
           "configSets" : {
-            "wordpress_install" : ["install_cfn", "install_wordpress", "configure_wordpress" ]
+            "wordpress_install" : ["install_cfn", "install_code_deploy"]
           },
           "install_cfn" : {
             "files": {
@@ -204,62 +204,19 @@
               }
             }
           },
-          "install_wordpress" : {
+          "install_code_deploy" : {
             "commands": {
-              "01_enable_php_74": {
-                "command": "amazon-linux-extras enable php7.4"
-              },
-              "02_install_packages": {
-                "command": "yum install -y php php-mysqlnd mariadb mariadb-devel mariadb-libs httpd mod_ssl php-dom php-imagick php-mbstring php-intl ruby"
-              },
-              "03_install_code_deploy": {
+              "install": {
                 "command": "/tmp/install-code-deploy",
                 "cwd": "/tmp"
               }
             },
-            "sources" : {
-              "/var/www/html" : "http://wordpress.org/latest.tar.gz"
-            },
             "files": {
-              "/tmp/wp-cli": {
-                "content": { "Fn::Join" : ["", [
-                  "#!/bin/bash -xe\n",
-                  "curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar\n",
-                  "chmod +x wp-cli.phar\n",
-                  "mv wp-cli.phar /usr/bin/wp\n",
-                  "wp cli update\n",
-                  "curl -O https://raw.githubusercontent.com/wp-cli/wp-cli/v2.6.0/utils/wp-completion.bash\n",
-                  "mv wp-completion.bash /usr/bin/\n",
-                  "source /usr/bin/wp-completion.bash\n",
-                  "wp plugin activate akismet\n",
-                  "wp plugin update akismet\n",
-                  "wp plugin activate hello\n",
-                  "wp theme delete twentytwenty\n",
-                  "wp theme delete twentytwentyone\n"
-                ]]},
-                "mode"  : "000500",
-                "owner" : "root",
-                "group" : "root"
-              },
-              "/tmp/create-wp-config": {
-                "content": { "Fn::Join": [ "", [
-                  "#!/bin/bash -xe\n",
-                  "cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php\n",
-                  "sed -i \"s/'database_name_here'/'",{ "Ref" : "DBName" }, "'/g\" wp-config.php\n",
-                  "sed -i \"s/'username_here'/'",{ "Ref" : "DBUser" }, "'/g\" wp-config.php\n",
-                  "sed -i \"s/'password_here'/'",{ "Ref" : "DBPassword" }, "'/g\" wp-config.php\n",
-                  "sed -i \"s/'localhost'/'",{ "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]}, "'/g\" wp-config.php\n",
-                  "sed -i \"/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','",{ "Ref" : "AkismetKey" }, "');\" wp-config.php\n",
-                  "sed -i \"s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g\" /etc/httpd/conf/httpd.conf\n",
-                  "service httpd restart"
-                ]]},
-                "mode" : "000500",
-                "owner" : "root",
-                "group" : "root"
-              },
               "/tmp/install-code-deploy": {
                 "content": { "Fn::Join": ["", [
                   "#!/bin/bash -xe\n",
+                  "yum install -y ruby httpd\n",
+                  "echo \"Instance is not healthy\" > /var/www/html/health.html\n",
                   "wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install\n",
                   "chmod +x install\n",
                   "./install auto"
@@ -267,30 +224,24 @@
                 "mode" : "000500",
                 "owner" : "root",
                 "group" : "root"
+              },
+              "/usr/sys-vars": {
+                "content": { "Fn::Join": ["", [
+                  "#!/bin/bash -xe\n",
+                  "export DBName=", {"Ref": "DBName"},"\n",
+                  "export DBUser=", {"Ref": "DBUser"},"\n",
+                  "export DBPassword=", {"Ref": "DBPassword"},"\n",
+                  "export AkismetKey=", {"Ref": "AkismetKey"},"\n",
+                  "export DBEndpoint=", { "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]},"\n"
+                ]]},
+                "mode" : "000500",
+                "owner" : "root",
+                "group" : "root" 
               }
             },
             "services": {
               "sysvinit": {
                 "httpd": { "enabled" : "true", "ensureRunning" : "true" }
-              }
-            }
-          },
-
-          "configure_wordpress": {
-            "commands": {
-              "01_configure_wordpress" : {
-                "command": "/tmp/create-wp-config",
-                "cwd": "/var/www/html/wordpress"
-              },
-              "02_move_website": {
-                  "command": "mv /var/www/html/wordpress/* /var/www/html"
-              },
-              "03_create_health_page": {
-                "command": "echo \"Instance is healthy\" >> /var/www/html/health.html"
-              },
-              "04_do_wp_cli_stuff": {
-                "command": "/tmp/wp-cli",
-                "cwd": "/var/www/html"
               }
             }
           }
