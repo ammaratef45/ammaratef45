@@ -1,0 +1,29 @@
+name: deployWP
+
+on:
+  workflow_run:
+    workflows: ["CFN"]
+    types:
+      - completed
+
+jobs:
+  deploy-code-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Create CodeDeploy Deployment
+        id: deploy
+        run: |
+          aws deploy create-deployment \
+            --application-name WordpressBlog-CodeDeployApp-7JDRAM7BS594 \
+            --deployment-group-name WordpressBlog-DeploymentGroupWP-13RJIDCJK25CY \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
+
