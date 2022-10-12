@@ -34,3 +34,5 @@ wp plugin update akismet
 wp plugin activate hello
 wp theme delete twentytwenty
 wp theme delete twentytwentyone
+wp plugin install google-site-kit
+wp plugin activate google-site-kit
