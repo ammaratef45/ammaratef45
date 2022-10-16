@@ -1,4 +1,6 @@
 import boto3
+from blessings import Terminal
+import keyboard
 
 AUTO_SCALING_GROUP_NAME = 'WordpressBlog-WebServerGroup-1ZQ6RC70U4DA'
 KEY_NAME = 'wordpressKey'
@@ -28,14 +30,17 @@ def instances():
   )
 
 def print_instance_ids():
+  ids = []
   for reservation in instances()['Reservations']:
     for instance in reservation['Instances']:
-      print(instance['InstanceId'])
+      ids.append(instance['InstanceId'])
+  return ids
 
 def terminate_instance(instance_id):
   ec2.terminate_instances(
     InstanceIds=[instance_id]
   )
+  return 'Terminated {}'.format(instance_id)
 
 def terminate_instance_prompt():
   instanceId = input('Enter instance ID:')
@@ -49,11 +54,14 @@ def change_desired_capacity(new_capacity):
 
 def change_capacity_to_2():
   change_desired_capacity(2)
+  return 'Done'
 
 def print_ssh_command():
+  results = []
   for reservation in instances()['Reservations']:
     for instance in reservation['Instances']:
-      print('ssh -i {}.pem ec2-user@{}'.format(KEY_NAME, instance['PublicDnsName']))
+      results.append('ssh -i {}.pem ec2-user@{}'.format(KEY_NAME, instance['PublicDnsName']))
+  return results
 
 def get_cfn_stack_status():
   stack = cloudformation.describe_stacks(
@@ -62,7 +70,7 @@ def get_cfn_stack_status():
   stack = stack['Stacks'][0]
   status = stack['StackStatus']
   time = stack['LastUpdatedTime']
-  print('Status:{}, time:{}'.format(status, time))
+  return 'Status:{}, time:{}'.format(status, time)
 
 class Command:
   def __init__(self, name, action):
@@ -71,15 +79,56 @@ class Command:
 
 
 commands = {
-  '0': Command('Change desired capacity to 2', change_capacity_to_2),
-  '1': Command('print ssh command for running hosts', print_ssh_command),
-  '2': Command('print cfn status', get_cfn_stack_status),
-  '3': Command('print instance Ids', print_instance_ids),
-  '4': Command('Terminate an EC2 Instance', terminate_instance_prompt)
+  0: Command('Change desired capacity to 2', change_capacity_to_2),
+  1: Command('print ssh command for running hosts', print_ssh_command),
+  2: Command('print cfn status', get_cfn_stack_status),
+  3: Command('print instance Ids', print_instance_ids),
+  4: Command('Terminate an EC2 Instance', terminate_instance_prompt)
 }
 
-if __name__=='__main__':
+selected = 0
+output_default = 'press space after selecting'
+output = output_default[:]
+
+def terminal():
+  global selected
+  global output
+  term = Terminal()
+  print(term.clear())
   for index in commands.keys():
-    print('{}: {}'.format(index, commands.get(index).name))
-  choice = input('Type the key of desired action: ')
-  commands.get(choice).action()
+    pre = '[x]' if index == selected else '[ ]'
+    print('{} {}'.format(pre, commands.get(index).name))
+  with term.location(0, term.height - 1):
+    print(output)
+
+def down(e):
+  global selected
+  global output
+  output = output_default[:]
+  selected = min(selected+1, len(commands)-1)
+  terminal()
+
+def up(e):
+  global selected
+  global output
+  output = output_default[:]
+  selected = max(selected-1, 0)
+  terminal()
+
+def space(e):
+  global selected
+  global output
+  output = commands.get(selected).action()
+  terminal()
+
+if __name__=='__main__':
+  terminal()
+  keyboard.on_press_key("down arrow", down)
+  keyboard.on_press_key("up arrow", up)
+  keyboard.on_press_key("space", space)
+  while True:
+    continue
+  # for index in commands.keys():
+  #   print('{}: {}'.format(index, commands.get(index).name))
+  # choice = input('Type the key of desired action: ')
+  # commands.get(choice).action()
