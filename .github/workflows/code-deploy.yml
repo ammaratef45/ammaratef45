@@ -1,10 +1,9 @@
 name: deployWP
 
 on:
-  workflow_run:
-    workflows: ["CFN"]
-    types:
-      - completed
+  push:
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   deploy-code-deploy:

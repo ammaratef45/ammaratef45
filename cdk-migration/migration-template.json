@@ -1,0 +1,520 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "AWS CloudFormation WordPress.",
+
+  "Parameters": {
+    "KeyName": {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair.",
+      "Default": "wordpressKey"
+    },
+    "InstanceType": {
+      "Description" : "WebServer EC2 instance type",
+      "Type" : "String",
+      "Default" : "t2.micro",
+      "AllowedValues" : ["t2.small", "t2.micro"],
+      "ConstraintDescription" : "must be a valid EC2 instance type."
+    },
+    "InstanceAmi": {
+      "Description": "AMI of the instance",
+      "Type": "String",
+      "Default": "ami-090fa75af13c156b4"
+    },
+    "VpcId": {
+      "Description": "VPC ID",
+      "Type": "String",
+      "Default": "vpc-098d5d6d1fc720f01"
+    },
+    "DBName": {
+      "Default": "wordpressdb",
+      "Description" : "The WordPress database name",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBUser": {
+      "NoEcho": "true",
+      "Description" : "The WordPress database admin account username",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBPassword": {
+      "NoEcho": "true",
+      "Description" : "The WordPress database admin account password",
+      "Type": "String",
+      "MinLength": "8",
+      "MaxLength": "41",
+      "AllowedPattern" : "[a-zA-Z0-9]*",
+      "ConstraintDescription" : "must contain only alphanumeric characters."
+    },
+    "AkismetKey": {
+      "NoEcho": "true",
+      "Description" : "The AKISMET API KEY",
+      "Type": "String"
+    }
+  },
+
+  "Resources" : {
+    "NotificationTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "Subscription": [ { "Endpoint": "ammar.atef45@gmail.com", "Protocol": "email" } ]
+      }
+    },
+    "WordpressDBInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "DBName": { "Ref" : "DBName" },
+        "MasterUsername": { "Ref" : "DBUser" },
+        "MasterUserPassword": { "Ref": "DBPassword"},
+        "Engine": "MySQL",
+        "DBInstanceClass": "db.t3.micro",
+        "StorageType": "gp2",
+        "PubliclyAccessible": false,
+        "AllocatedStorage": "20",
+        "DBInstanceIdentifier": {"Fn::Join": ["-", [ "WordpressDBInstance", {"Ref": "AWS::Region"} ]]},
+        "AvailabilityZone": {"Fn::Select": [1, { "Fn::GetAZs" : "" }]},
+        "VPCSecurityGroups" : [ { "Fn::GetAtt": [ "DBSecurityGroup", "GroupId" ] } ]
+      },
+      "DeletionPolicy": "Snapshot",
+      "UpdateReplacePolicy": "Snapshot"
+    },
+    "DBSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription": "Open database for access",
+        "SecurityGroupIngress" : [{
+          "IpProtocol" : "tcp",
+          "FromPort" : 3306,
+          "ToPort" : 3306,
+          "SourceSecurityGroupName" : { "Ref" : "WebServerSecurityGroup" }
+        }]
+      }
+    },
+    "LoadBalancerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Open https and https for access",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
+      ]
+      }
+    },
+    "WebServerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable HTTP(80), HTTPS(443), and SSH(22)",
+        "SecurityGroupIngress" : [
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : 80,
+            "ToPort" : 80,
+            "SourceSecurityGroupId" : { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }
+          },
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : 443,
+            "ToPort" : 443,
+            "SourceSecurityGroupId" : { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] }
+          },
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }
+    },
+    "WebServerGroup" : {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": { "Fn::GetAZs" : ""},
+        "LaunchConfigurationName": { "Ref" : "LaunchConfig" },
+        "MinSize": "1",
+        "MaxSize": "3",
+        "TerminationPolicies": ["OldestInstance"],
+        "TargetGroupARNs": [{ "Ref": "TargetGroup" }],
+        "NotificationConfiguration" : {
+          "TopicARN" : { "Ref" : "NotificationTopic" },
+          "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH",
+                                  "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+                                  "autoscaling:EC2_INSTANCE_TERMINATE",
+                                  "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"]
+        }
+      },
+      "CreationPolicy" : {
+        "ResourceSignal" : {
+          "Timeout" : "PT15M",
+          "Count"   : "1"
+        }
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": "1",
+          "MaxBatchSize": "1",
+          "PauseTime" : "PT15M",
+          "WaitOnResourceSignals": "true"
+        }
+      }
+    },
+
+    "LaunchConfig": {
+      "Type" : "AWS::AutoScaling::LaunchConfiguration",
+      "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "configSets" : {
+            "wordpress_install" : ["install_cfn", "install_code_deploy"]
+          },
+          "install_cfn" : {
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": { "Fn::Join": [ "", [
+                  "[main]\n",
+                  "stack=", { "Ref": "AWS::StackId" }, "\n",
+                  "region=", { "Ref": "AWS::Region" }, "\n"
+                ]]},
+                "mode"  : "000400",
+                "owner" : "root",
+                "group" : "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": { "Fn::Join": [ "", [
+                  "[cfn-auto-reloader-hook]\n",
+                  "triggers=post.update\n",
+                  "path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init\n",
+                  "action=/opt/aws/bin/cfn-init -v ",
+                          "         --stack ", { "Ref" : "AWS::StackName" },
+                          "         --resource LaunchConfig ",
+                          "         --configsets wordpress_install ",
+                          "         --region ", { "Ref" : "AWS::Region" }, "\n"
+                ]]},          
+                "mode"  : "000400",
+                "owner" : "root",
+                "group" : "root"
+              }
+            },
+            "services" : {
+              "sysvinit" : {
+                "cfn-hup" : { "enabled" : "true", "ensureRunning" : "true",
+                              "files" : ["/etc/cfn/cfn-hup.conf", "/etc/cfn/hooks.d/cfn-auto-reloader.conf"] }
+              }
+            }
+          },
+          "install_code_deploy" : {
+            "commands": {
+              "install": {
+                "command": "/tmp/install-code-deploy",
+                "cwd": "/tmp"
+              }
+            },
+            "files": {
+              "/tmp/install-code-deploy": {
+                "content": { "Fn::Join": ["", [
+                  "#!/bin/bash -xe\n",
+                  "yum install -y ruby httpd\n",
+                  "echo \"Instance is not healthy\" > /var/www/html/health.html\n",
+                  "wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install\n",
+                  "chmod +x install\n",
+                  "./install auto"
+                ]]},
+                "mode" : "000500",
+                "owner" : "root",
+                "group" : "root"
+              },
+              "/usr/sys-vars": {
+                "content": { "Fn::Join": ["", [
+                  "#!/bin/bash -xe\n",
+                  "export DBName=", {"Ref": "DBName"},"\n",
+                  "export DBUser=", {"Ref": "DBUser"},"\n",
+                  "export DBPassword=", {"Ref": "DBPassword"},"\n",
+                  "export AkismetKey=", {"Ref": "AkismetKey"},"\n",
+                  "export DBEndpoint=", { "Fn::GetAtt": ["WordpressDBInstance", "Endpoint.Address"]},"\n"
+                ]]},
+                "mode" : "000500",
+                "owner" : "root",
+                "group" : "root" 
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "httpd": { "enabled" : "true", "ensureRunning" : "true" }
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "ImageId": { "Ref": "InstanceAmi" },
+        "IamInstanceProfile": {"Ref": "WebServerInstanceProfile"},
+        "InstanceType": { "Ref": "InstanceType" },
+        "SecurityGroups": [ {"Ref": "WebServerSecurityGroup"} ],
+        "KeyName": { "Ref": "KeyName" },
+        "UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
+                       "#!/bin/bash -xe\n",
+                       "yum update -y aws-cfn-bootstrap\n",
+
+                       "/opt/aws/bin/cfn-init -v ",
+                       "         --stack ", { "Ref" : "AWS::StackName" },
+                       "         --resource LaunchConfig ",
+                       "         --configsets wordpress_install ",
+                       "         --region ", { "Ref" : "AWS::Region" }, "\n",
+
+                       "/opt/aws/bin/cfn-signal -e $? ",
+                       "         --stack ", { "Ref" : "AWS::StackName" },
+                       "         --resource WebServerGroup ",
+                       "         --region ", { "Ref" : "AWS::Region" }, "\n"
+        ]]}}
+      },
+      "CreationPolicy" : {
+        "ResourceSignal" : {
+          "Timeout" : "PT15M"
+        }
+      }
+    },
+    "WebServerInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties" : {
+          "Roles" : [{"Ref": "WebServerRole"}]
+        }
+    },
+    "WebServerScaleUpPolicy" : {
+      "Type" : "AWS::AutoScaling::ScalingPolicy",
+      "Properties" : {
+        "AdjustmentType" : "ChangeInCapacity",
+        "AutoScalingGroupName" : { "Ref" : "WebServerGroup" },
+        "Cooldown" : "60",
+        "ScalingAdjustment" : "1"
+      }
+    },
+    "WebServerScaleDownPolicy" : {
+      "Type" : "AWS::AutoScaling::ScalingPolicy",
+      "Properties" : {
+        "AdjustmentType" : "ChangeInCapacity",
+        "AutoScalingGroupName" : { "Ref" : "WebServerGroup" },
+        "Cooldown" : "60",
+        "ScalingAdjustment" : "-1"
+      }
+    },
+    "CPUAlarmHigh": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+         "AlarmDescription": "Scale-up if CPU > 80% for 10 minutes",
+         "MetricName": "CPUUtilization",
+         "Namespace": "AWS/EC2",
+         "Statistic": "Average",
+         "Period": "300",
+         "EvaluationPeriods": "2",
+         "Threshold": "80",
+         "AlarmActions": [ { "Ref": "WebServerScaleUpPolicy" } ],
+         "Dimensions": [
+           {
+             "Name": "AutoScalingGroupName",
+             "Value": { "Ref": "WebServerGroup" }
+           }
+         ],
+         "ComparisonOperator": "GreaterThanThreshold"
+       }
+     },
+     "CPUAlarmLow": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+         "AlarmDescription": "Scale-down if CPU < 70% for 10 minutes",
+         "MetricName": "CPUUtilization",
+         "Namespace": "AWS/EC2",
+         "Statistic": "Average",
+         "Period": "300",
+         "EvaluationPeriods": "2",
+         "Threshold": "70",
+         "AlarmActions": [ { "Ref": "WebServerScaleDownPolicy" } ],
+         "Dimensions": [
+           {
+             "Name": "AutoScalingGroupName",
+             "Value": { "Ref": "WebServerGroup" }
+           }
+         ],
+         "ComparisonOperator": "LessThanThreshold"
+       }
+     },
+    "ApplicationLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+          "SecurityGroups": [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
+          "Subnets": [
+            "subnet-07c6ae5cd5bbe52f8",
+            "subnet-0f76be8a4f664b079",
+            "subnet-03dc815639f4113f1",
+            "subnet-0346d8ebb5eded80e",
+            "subnet-05df740366c23a722",
+            "subnet-09c0d0d6e5196018e"
+          ]
+        }
+    },
+    "HTTPSListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "TargetGroup" }
+        }],
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "Certificates": [
+          {"CertificateArn" : "arn:aws:acm:us-east-1:835451110523:certificate/00527141-a7f7-4dac-a199-cde2006aa539"}
+        ]
+      }
+    },
+    "HTTPListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [{
+          "Type": "redirect",
+            "RedirectConfig": {
+              "Protocol": "HTTPS",
+              "Port": 443,
+              "Host": "#{host}",
+              "Path": "/#{path}",
+              "Query": "#{query}",
+              "StatusCode": "HTTP_301"
+            }
+        }],
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    },
+    "TargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "Name": { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "TargetGroup" ] ] },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "VpcId": { "Ref": "VpcId" },
+        "UnhealthyThresholdCount": 5,
+        "HealthyThresholdCount": 3,
+        "HealthCheckPath": "/health.html",
+        "HealthCheckPort": 80,
+        "HealthCheckProtocol": "HTTP"
+      },
+      "DependsOn": [ "ApplicationLoadBalancer" ]
+    },
+    "CodeDeployApp": {
+      "Type": "AWS::CodeDeploy::Application"
+    },
+    "CodeDeployRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["codedeploy.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "allow-autoscaling",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:*",
+                    "autoscaling:*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "WebServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com",
+                  "codedeploy.amazonaws.com"
+                ]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "QOTD",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:List*",
+                    "dynamodb:DescribeReservedCapacity*",
+                    "dynamodb:DescribeLimits",
+                    "dynamodb:DescribeTimeToLive"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "dynamodb:BatchGet*",
+                    "dynamodb:DescribeStream",
+                    "dynamodb:DescribeTable",
+                    "dynamodb:Get*",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchWrite*",
+                    "dynamodb:CreateTable",
+                    "dynamodb:Delete*",
+                    "dynamodb:Update*",
+                    "dynamodb:PutItem"
+                  ],
+                  "Resource": [
+                    "arn:aws:dynamodb:us-east-1:835451110523:table/QOTD_questions",
+                    "arn:aws:dynamodb:us-east-1:835451110523:table/QOTD_channels"
+                  ],
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DeploymentGroupWP": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "Properties": {
+        "ApplicationName": {"Ref": "CodeDeployApp"},
+        "AutoScalingGroups": [{"Ref": "WebServerGroup"}],
+        "DeploymentConfigName": "CodeDeployDefault.HalfAtATime",
+        "ServiceRoleArn": { "Fn::GetAtt": ["CodeDeployRole", "Arn"]}
+      }
+    }
+  },
+
+  "Outputs": {
+    "URL": {
+      "Description": "The URL of the website",
+      "Value": {"Fn::Join": ["", ["http://", {"Fn::GetAtt": ["ApplicationLoadBalancer", "DNSName"]}]]}
+    }
+  }
+}
