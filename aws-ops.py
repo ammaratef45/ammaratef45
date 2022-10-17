@@ -128,7 +128,3 @@ if __name__=='__main__':
   keyboard.on_press_key("space", space)
   while True:
     continue
-  # for index in commands.keys():
-  #   print('{}: {}'.format(index, commands.get(index).name))
-  # choice = input('Type the key of desired action: ')
-  # commands.get(choice).action()
