@@ -19,7 +19,7 @@ sed -i "/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','$AkismetKey');" /var/www/html/w
 sed -i "/^.*WP_DEBUG.*/a define('WP_CACHE',true);" /var/www/html/wp-config.php
 sed -i "s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g" /etc/httpd/conf/httpd.conf
 
-# enable text compression
+# .htaccess file (enable text compression and w3 cache plugin)
 echo "LoadModule deflate_module modules/mod_deflate.so" >> /etc/httpd/conf/httpd.conf
 echo "# GZIP compression for text files: HTML, CSS, JS, Text, XML, fonts
 <IfModule mod_deflate.c>
@@ -210,12 +210,16 @@ wp cli update
 curl -O https://raw.githubusercontent.com/wp-cli/wp-cli/v2.6.0/utils/wp-completion.bash
 mv wp-completion.bash /usr/bin/
 source /usr/bin/wp-completion.bash
+cd /var/www/html
+
+# download images
+aws s3 sync s3://wordpresspublicimages images
+wp media import images/**\/*.jpg
+yes | rm -rf image
+
 
 # wp-cli plugins
-cd /var/www/html
-wp plugin activate akismet
 wp plugin update akismet
-wp plugin activate hello
 wp theme delete twentytwenty
 wp theme delete twentytwentyone
 wp plugin install google-site-kit

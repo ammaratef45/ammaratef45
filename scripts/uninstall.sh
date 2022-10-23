@@ -2,4 +2,4 @@
 
 set -e
 
-rm -rf /var/www/html/*
+yes | rm -rf /var/www/html/*

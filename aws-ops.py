@@ -52,9 +52,10 @@ def change_desired_capacity(new_capacity):
     DesiredCapacity=new_capacity,
   )
 
-def change_capacity_to_2():
-  change_desired_capacity(2)
-  return 'Done'
+def referesh_instances():
+  return autoscaling.start_instance_refresh(
+    AutoScalingGroupName=AUTO_SCALING_GROUP_NAME
+  )
 
 def print_ssh_command():
   results = []
@@ -79,7 +80,7 @@ class Command:
 
 
 commands = {
-  0: Command('Change desired capacity to 2', change_capacity_to_2),
+  0: Command('refresh instances', referesh_instances),
   1: Command('print ssh command for running hosts', print_ssh_command),
   2: Command('print cfn status', get_cfn_stack_status),
   3: Command('print instance Ids', print_instance_ids),
