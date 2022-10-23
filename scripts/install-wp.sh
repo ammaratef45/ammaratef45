@@ -219,9 +219,8 @@ wp plugin activate hello
 wp theme delete twentytwenty
 wp theme delete twentytwentyone
 wp plugin install google-site-kit
-wp plugin activate google-site-kit
 wp plugin install w3-total-cache
-wp plugin activate w3-total-cache
+wp plugin install wordpress-seo
 # enable page cache
 cp /var/www/html/wp-content/plugins/w3-total-cache/wp-content/advanced-cache.php /var/www/html/wp-content/advanced-cache.php
 mkdir /var/www/html/wp-content/cache
