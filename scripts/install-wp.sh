@@ -22,9 +22,9 @@ sed -i "s/AllowOverride None/AllowOverride FileInfo/g" /etc/httpd/conf/httpd.con
 
 # .htaccess file (enable text compression and w3 cache plugin)
 echo "LoadModule deflate_module modules/mod_deflate.so" >> /etc/httpd/conf/httpd.conf
-touch ../.htaccess
-yes | rm ../.htaccess
-cp .htaccess ../
+touch /var/www/html/.htaccess
+yes | rm /var/www/html/.htaccess
+cp /var/www/html/scripts/.htaccess /var/www/html/
 sed -i "/^.*WP_USE_THEMES.*/a ob_start(\"ob_gzhandler\");" /var/www/html/index.php
 service httpd restart
 
