@@ -22,6 +22,9 @@ sed -i "s/AllowOverride None/AllowOverride FileInfo/g" /etc/httpd/conf/httpd.con
 
 # .htaccess file (enable text compression and w3 cache plugin)
 echo "LoadModule deflate_module modules/mod_deflate.so" >> /etc/httpd/conf/httpd.conf
+touch ../.htaccess
+yes | rm ../.htaccess
+cp .htaccess ../
 sed -i "/^.*WP_USE_THEMES.*/a ob_start(\"ob_gzhandler\");" /var/www/html/index.php
 service httpd restart
 
@@ -46,14 +49,4 @@ wp plugin update akismet
 wp theme delete twentytwenty
 wp theme delete twentytwentyone
 wp plugin install google-site-kit
-wp plugin install w3-total-cache
 wp plugin install wordpress-seo
-# enable page cache
-sed -i "s/\"pgcache.enabled\": false/\"pgcache.enabled\": true/g" /var/www/html/wp-config.php
-
-cp /var/www/html/wp-content/plugins/w3-total-cache/wp-content/advanced-cache.php /var/www/html/wp-content/advanced-cache.php
-mkdir /var/www/html/wp-content/cache
-chmod 777 /var/www/html/wp-content/cache
-mkdir /var/www/html/wp-content/w3tc-config
-chmod 777 /var/www/html/wp-content/w3tc-config
-service httpd restart
