@@ -90,6 +90,7 @@ commands = {
 selected = 0
 output_default = 'press space after selecting'
 output = output_default[:]
+exitting = False
 
 def terminal():
   global selected
@@ -122,10 +123,16 @@ def space(e):
   output = commands.get(selected).action()
   terminal()
 
+def esc(e):
+  global exitting
+  exitting = True
+  exit(0)
+
 if __name__=='__main__':
   terminal()
   keyboard.on_press_key("down arrow", down)
   keyboard.on_press_key("up arrow", up)
   keyboard.on_press_key("space", space)
-  while True:
+  keyboard.on_press_key("esc", esc)
+  while not exitting:
     continue
