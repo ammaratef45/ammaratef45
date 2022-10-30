@@ -15,11 +15,16 @@ sed -i "s/'password_here'/'$DBPassword'/g" /var/www/html/wp-config.php
 sed -i "s/'localhost'/'$DBEndpoint'/g" /var/www/html/wp-config.php
 # enable spamming api
 sed -i "/^.*WP_DEBUG.*/a define('WPCOM_API_KEY','$AkismetKey');" /var/www/html/wp-config.php
-# enable w3 cache
+# enable cache
 sed -i "/^.*WP_DEBUG.*/a define('WP_CACHE',true);" /var/www/html/wp-config.php
+sed -i "/^.*WP_DEBUG.*/a define('WPCACHEHOME','/var/www/html/wp-content/plugins/wp-super-cache/');" /var/www/html/wp-config.php
 sed -i "s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/g" /etc/httpd/conf/httpd.conf
 sed -i "s/AllowOverride None/AllowOverride FileInfo/g" /etc/httpd/conf/httpd.conf
-
+cp /var/www/html/scripts/advanced-cache.php /var/www/html/wp-content/
+cp /var/www/html/scripts/wp-cache-config.php /var/www/html/wp-content/
+chmod 777 /var/www/html/wp-content/wp-cache-config.php
+mkdir /var/www/html/wp-content/cache
+chmod 777 /var/www/html/wp-content/cache
 # .htaccess file (enable text compression and w3 cache plugin)
 echo "LoadModule deflate_module modules/mod_deflate.so" >> /etc/httpd/conf/httpd.conf
 touch /var/www/html/.htaccess
@@ -57,4 +62,5 @@ wp plugin update akismet
 wp theme delete twentytwenty
 wp theme delete twentytwentyone
 wp plugin install google-site-kit
+wp plugin install wp-super-cache
 wp plugin install wordpress-seo
