@@ -11,4 +11,3 @@ sh /var/www/html/scripts/configure-wp-plugins.sh
 sh /var/www/html/scripts/configure-apache.sh
 sh /var/www/html/scripts/install-wp-cli.sh
 sh /var/www/html/scripts/install-wp-plugins.sh
-sh /var/www/html/scripts/update-media.sh

@@ -11,3 +11,4 @@ wp plugin install google-site-kit
 wp plugin install wp-super-cache
 wp plugin install wordpress-seo
 wp plugin install newsletter
+wp plugin install amazon-s3-and-cloudfront
