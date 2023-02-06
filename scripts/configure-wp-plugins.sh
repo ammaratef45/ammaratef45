@@ -9,8 +9,8 @@ sed -i "/^.*WP_DEBUG.*/a define('WPCACHEHOME','/var/www/html/wp-content/plugins/
 cp /var/www/html/scripts/advanced-cache.php /var/www/html/wp-content/
 cp /var/www/html/scripts/wp-cache-config.php /var/www/html/wp-content/
 mkdir /var/www/html/wp-content/uploads
-chmod 777 /var/www/html/wp-content/uploads
-chmod 777 /var/www/html/wp-content/wp-cache-config.php
+chown -R apache:apache /var/www/html/wp-content/uploads
+chown -R apache:apache /var/www/html/wp-content/wp-cache-config.php
 mkdir /var/www/html/wp-content/cache
-chmod 777 /var/www/html/wp-content/cache
+chown -R apache:apache /var/www/html/wp-content/cache
 service httpd restart
