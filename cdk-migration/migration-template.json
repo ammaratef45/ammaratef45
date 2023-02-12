@@ -362,10 +362,7 @@
         }],
         "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
         "Port": 443,
-        "Protocol": "HTTPS",
-        "Certificates": [
-          {"CertificateArn" : "arn:aws:acm:us-east-1:835451110523:certificate/00527141-a7f7-4dac-a199-cde2006aa539"}
-        ]
+        "Protocol": "HTTPS"
       }
     },
     "HTTPListener": {

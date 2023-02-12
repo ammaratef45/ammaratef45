@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Instance, InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 
@@ -62,6 +62,34 @@ export class CdkMigrationStack extends cdk.Stack {
     const webServerRoleCfn = cfnInclude.getResource('WebServerRole') as cdk.aws_iam.CfnRole;
     const webServerRole = cdk.aws_iam.Role.fromRoleArn(this, 'WebServerRole', webServerRoleCfn.attrArn);
     webServerRole.attachInlinePolicy(getSecretPolicy);
+
+    // create CDN
+    
+    const loadBalancer_cfn = cfnInclude.getResource('ApplicationLoadBalancer') as cdk.aws_elasticloadbalancingv2.CfnLoadBalancer;
+    const listner_cfn = cfnInclude.getResource('HTTPSListener') as cdk.aws_elasticloadbalancingv2.CfnListener;
+    const listener = cdk.aws_elasticloadbalancingv2.ApplicationListener.fromApplicationListenerAttributes(this, 'listener', {
+      listenerArn: listner_cfn.attrListenerArn,
+      securityGroup: cdk.aws_ec2.SecurityGroup.fromSecurityGroupId(this,'listenerSG',loadBalancer_cfn.attrSecurityGroups[0]),
+    });
+    const certificate = cdk.aws_elasticloadbalancingv2.ListenerCertificate.fromArn('arn:aws:acm:us-east-1:835451110523:certificate/0fe091aa-a16d-4660-afb8-cd5ef7b56c83');
+    listener.addCertificates('certs', [certificate]);
+    const loadBalancer = cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer.fromApplicationLoadBalancerAttributes(this, 'lb', {
+      loadBalancerArn: listner_cfn.loadBalancerArn,
+      securityGroupId: loadBalancer_cfn.attrSecurityGroups[0],
+      loadBalancerDnsName: loadBalancer_cfn.attrDnsName
+    });
+    const distribution = new cdk.aws_cloudfront.Distribution(this, 'cdn', {
+      defaultBehavior: {
+        origin: new cdk.aws_cloudfront_origins.HttpOrigin('cdn.ammaratef45.com', {
+          keepaliveTimeout: cdk.Duration.seconds(60),
+          readTimeout: cdk.Duration.seconds(30),
+        }),
+        viewerProtocolPolicy: cdk.aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cdk.aws_cloudfront.AllowedMethods.ALLOW_ALL,
+        cachedMethods: cdk.aws_cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+      },
+      minimumProtocolVersion: cdk.aws_cloudfront.SecurityPolicyProtocol.TLS_V1,
+    });
   }
 
   createRecycleLambda(scope: Construct): cdk.aws_lambda.Function {
