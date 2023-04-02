@@ -13,7 +13,7 @@ export class CdkMigrationStack extends cdk.Stack {
     });
 
     // Pass instancetype to the cloudformation template parameter
-    const instanceType = InstanceType.of(InstanceClass.T2, InstanceSize.MICRO);
+    const instanceType = InstanceType.of(InstanceClass.T2, InstanceSize.NANO);
     const cfnInclude = new cdk.cloudformation_include.CfnInclude(this, 'Template', { 
       templateFile: 'migration-template.json',
       parameters: {
