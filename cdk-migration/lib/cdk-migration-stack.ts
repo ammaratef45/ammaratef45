@@ -89,6 +89,12 @@ export class CdkMigrationStack extends cdk.Stack {
         cachedMethods: cdk.aws_cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
       },
       minimumProtocolVersion: cdk.aws_cloudfront.SecurityPolicyProtocol.TLS_V1,
+      domainNames: [
+        'www.ammaratef45.com',
+        '*.ammaratef45.com',
+        'ammaratef45.com'
+      ],
+      certificate: cdk.aws_certificatemanager.Certificate.fromCertificateArn(this, 'cdnCert', 'arn:aws:acm:us-east-1:835451110523:certificate/58407219-e782-4e4a-8e0c-6596988aa455')
     });
   }
 
