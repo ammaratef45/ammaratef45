@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import { InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
+import { OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -84,6 +85,7 @@ export class CdkMigrationStack extends cdk.Stack {
           keepaliveTimeout: cdk.Duration.seconds(60),
           readTimeout: cdk.Duration.seconds(30),
         }),
+        originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
         viewerProtocolPolicy: cdk.aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cdk.aws_cloudfront.AllowedMethods.ALLOW_ALL,
         cachedMethods: cdk.aws_cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
