@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import { InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
-import { OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { BehaviorOptions, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -79,17 +79,14 @@ export class CdkMigrationStack extends cdk.Stack {
       securityGroupId: loadBalancer_cfn.attrSecurityGroups[0],
       loadBalancerDnsName: loadBalancer_cfn.attrDnsName
     });
+    const cacheEnabledBehavior = this.createBehavior(CachePolicy.CACHING_OPTIMIZED);
+    const cacheDisabledBehavior = this.createBehavior(CachePolicy.CACHING_DISABLED);
     const distribution = new cdk.aws_cloudfront.Distribution(this, 'cdn', {
-      defaultBehavior: {
-        origin: new cdk.aws_cloudfront_origins.HttpOrigin('cdn.ammaratef45.com', {
-          keepaliveTimeout: cdk.Duration.seconds(60),
-          readTimeout: cdk.Duration.seconds(30),
-        }),
-        originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
-        viewerProtocolPolicy: cdk.aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        allowedMethods: cdk.aws_cloudfront.AllowedMethods.ALLOW_ALL,
-        cachedMethods: cdk.aws_cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
-      },
+      defaultBehavior: cacheEnabledBehavior,
+      additionalBehaviors: [
+        '/wp-login.php', '/wp-admin/*', '/wp-json/*', '/.well-known/*',
+        '/wp-cron.php', '/xmlrpc.php', '/wp-trackback.php', '/wp-signup.php'
+      ].reduce((acc, k)=>({...acc, [k]:cacheDisabledBehavior}), {}),
       minimumProtocolVersion: cdk.aws_cloudfront.SecurityPolicyProtocol.TLS_V1,
       domainNames: [
         'www.ammaratef45.com',
@@ -98,6 +95,20 @@ export class CdkMigrationStack extends cdk.Stack {
       ],
       certificate: cdk.aws_certificatemanager.Certificate.fromCertificateArn(this, 'cdnCert', 'arn:aws:acm:us-east-1:835451110523:certificate/58407219-e782-4e4a-8e0c-6596988aa455')
     });
+  }
+
+  createBehavior(cachePolicy: ICachePolicy): BehaviorOptions {
+    return {
+      origin: new cdk.aws_cloudfront_origins.HttpOrigin('cdn.ammaratef45.com', {
+        keepaliveTimeout: cdk.Duration.seconds(60),
+        readTimeout: cdk.Duration.seconds(30),
+      }),
+      originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
+      cachePolicy: cachePolicy,
+      viewerProtocolPolicy: cdk.aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      allowedMethods: cdk.aws_cloudfront.AllowedMethods.ALLOW_ALL,
+      cachedMethods: cdk.aws_cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+    };
   }
 
   createRecycleLambda(scope: Construct): cdk.aws_lambda.Function {
