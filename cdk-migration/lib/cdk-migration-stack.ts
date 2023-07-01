@@ -4,6 +4,7 @@ import { InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import { BehaviorOptions, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -65,7 +66,6 @@ export class CdkMigrationStack extends cdk.Stack {
     webServerRole.attachInlinePolicy(getSecretPolicy);
 
     // create CDN
-    
     const loadBalancer_cfn = cfnInclude.getResource('ApplicationLoadBalancer') as cdk.aws_elasticloadbalancingv2.CfnLoadBalancer;
     const listner_cfn = cfnInclude.getResource('HTTPSListener') as cdk.aws_elasticloadbalancingv2.CfnListener;
     const listener = cdk.aws_elasticloadbalancingv2.ApplicationListener.fromApplicationListenerAttributes(this, 'listener', {
@@ -79,9 +79,15 @@ export class CdkMigrationStack extends cdk.Stack {
       securityGroupId: loadBalancer_cfn.attrSecurityGroups[0],
       loadBalancerDnsName: loadBalancer_cfn.attrDnsName
     });
-    const cacheEnabledBehavior = this.createBehavior(CachePolicy.CACHING_OPTIMIZED);
-    const cacheDisabledBehavior = this.createBehavior(CachePolicy.CACHING_DISABLED);
+    const origin = this.createOrigin();
+    const cacheEnabledBehavior = this.createBehavior(CachePolicy.CACHING_OPTIMIZED, origin);
+    const cacheDisabledBehavior = this.createBehavior(CachePolicy.CACHING_DISABLED, origin);
     const distribution = new cdk.aws_cloudfront.Distribution(this, 'cdn', {
+      enableLogging: true,
+      logBucket: new cdk.aws_s3.Bucket(this, 'cdn_logbucket', {
+        accessControl: cdk.aws_s3.BucketAccessControl.BUCKET_OWNER_READ,
+        objectOwnership: cdk.aws_s3.ObjectOwnership.OBJECT_WRITER,
+      }),
       defaultBehavior: cacheEnabledBehavior,
       additionalBehaviors: [
         '/wp-login.php', '/wp-admin/*', '/wp-json/*', '/.well-known/*',
@@ -97,13 +103,17 @@ export class CdkMigrationStack extends cdk.Stack {
     });
   }
 
-  createBehavior(cachePolicy: ICachePolicy): BehaviorOptions {
+  createOrigin(): HttpOrigin {
+    return new cdk.aws_cloudfront_origins.HttpOrigin('cdn.ammaratef45.com', {
+      keepaliveTimeout: cdk.Duration.seconds(60),
+      readTimeout: cdk.Duration.seconds(30),
+    });
+  }
+
+  createBehavior(cachePolicy: ICachePolicy, origin: HttpOrigin): BehaviorOptions {
     return {
-      origin: new cdk.aws_cloudfront_origins.HttpOrigin('cdn.ammaratef45.com', {
-        keepaliveTimeout: cdk.Duration.seconds(60),
-        readTimeout: cdk.Duration.seconds(30),
-      }),
-      originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
+      origin: origin,
+      originRequestPolicy: OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       cachePolicy: cachePolicy,
       viewerProtocolPolicy: cdk.aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cdk.aws_cloudfront.AllowedMethods.ALLOW_ALL,
