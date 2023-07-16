@@ -12,4 +12,3 @@ wp plugin install wp-super-cache
 wp plugin install wordpress-seo
 wp plugin install amazon-s3-and-cloudfront
 wp plugin install newsletters-lite
-wp plugin install jetpack

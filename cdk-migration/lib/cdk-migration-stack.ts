@@ -5,6 +5,7 @@ import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import { BehaviorOptions, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { Bucket, BucketAccessControl, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -82,12 +83,10 @@ export class CdkMigrationStack extends cdk.Stack {
     const origin = this.createOrigin();
     const cacheEnabledBehavior = this.createBehavior(CachePolicy.CACHING_OPTIMIZED, origin);
     const cacheDisabledBehavior = this.createBehavior(CachePolicy.CACHING_DISABLED, origin);
+    const logBucket = this.createLogBucket(this);
     const distribution = new cdk.aws_cloudfront.Distribution(this, 'cdn', {
       enableLogging: true,
-      logBucket: new cdk.aws_s3.Bucket(this, 'cdn_logbucket', {
-        accessControl: cdk.aws_s3.BucketAccessControl.BUCKET_OWNER_READ,
-        objectOwnership: cdk.aws_s3.ObjectOwnership.OBJECT_WRITER,
-      }),
+      logBucket: logBucket,
       defaultBehavior: cacheEnabledBehavior,
       additionalBehaviors: [
         '/wp-login.php', '/wp-admin/*', '/wp-json/*', '/.well-known/*',
@@ -100,6 +99,18 @@ export class CdkMigrationStack extends cdk.Stack {
         'ammaratef45.com'
       ],
       certificate: cdk.aws_certificatemanager.Certificate.fromCertificateArn(this, 'cdnCert', 'arn:aws:acm:us-east-1:835451110523:certificate/58407219-e782-4e4a-8e0c-6596988aa455')
+    });
+  }
+
+  createLogBucket(scope: Construct): Bucket {
+    return new Bucket(this, 'cdn_logbucket', {
+      accessControl: BucketAccessControl.BUCKET_OWNER_READ,
+      objectOwnership: ObjectOwnership.OBJECT_WRITER,
+      lifecycleRules: [
+        {
+          expiration: cdk.Duration.days(7),
+        }
+      ]
     });
   }
 
