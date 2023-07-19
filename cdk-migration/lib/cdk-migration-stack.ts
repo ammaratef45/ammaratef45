@@ -1,11 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { CfnEIP, InstanceClass, InstanceSize, InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
-import { BehaviorOptions, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { BehaviorOptions, CachePolicy, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket, BucketAccessControl, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
+import { Function } from "aws-cdk-lib/aws-lambda";
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,16 +27,11 @@ export class CdkMigrationStack extends cdk.Stack {
         },
     });
 
+    // ========= lambda =============== //
     // lambda to recycle instances once a month
-    const lambda = this.createRecycleLambda(this);
-    const scaleUpPolicy = this.createScaleUpPolicy();
-    lambda.role?.attachInlinePolicy(
-      new cdk.aws_iam.Policy(this, 'scale-up-policy', {
-        statements: [scaleUpPolicy],
-      }),
-    );
-    const rule = this.createSceduleRule(this);
-    rule.addTarget(new cdk.aws_events_targets.LambdaFunction(lambda));
+    const recycle_lambda = this.createRecycleLambda(this);
+    // lambda to attach eip to new instances
+    const attach_eip_lambda = this.createAttachEipLambda(this, new CfnEIP(this, "eip", {}));
 
     // create s3 bucket for the wp media
     const media_bucket = new cdk.aws_s3.Bucket(this, 'media-bucket', {});
@@ -132,12 +130,17 @@ export class CdkMigrationStack extends cdk.Stack {
     };
   }
 
-  createRecycleLambda(scope: Construct): cdk.aws_lambda.Function {
-    return new cdk.aws_lambda.Function(scope, 'refereshInstancesFunction', {
-      runtime: Runtime.PYTHON_3_8,
-      code: cdk.aws_lambda.Code.fromAsset(path.join(__dirname, 'refereshInstancesHandler')),
-      handler: 'index.main',
-    });
+  createRecycleLambda(scope: Construct): Function {
+    const lambda = this.createLambda(scope, 'refereshInstancesFunction', 'refereshInstancesHandler');
+    const scaleUpPolicy = this.createScaleUpPolicy();
+    lambda.role?.attachInlinePolicy(
+      new cdk.aws_iam.Policy(this, 'scale-up-policy', {
+        statements: [scaleUpPolicy],
+      }),
+    );
+    const rule = this.createSceduleRule(this);
+    rule.addTarget(new LambdaFunction(lambda));
+    return lambda;
   }
 
   createScaleUpPolicy(): cdk.aws_iam.PolicyStatement {
@@ -175,5 +178,23 @@ export class CdkMigrationStack extends cdk.Stack {
         })
       ]
      });
+  }
+
+  createAttachEipLambda(scope: Construct, eip: CfnEIP) {
+    const lambda = this.createLambda(scope, 'attachEipLambda', 'attachEipHandler');
+    const asg = AutoScalingGroup.fromAutoScalingGroupName(this, 'asg', 'WordpressBlog-WebServerGroup-1ZQ6RC70U4DA');
+    const hook = new LifecycleHook(this, "attachEipHook", {
+      autoScalingGroup: asg,
+      lifecycleTransition: LifecycleTransition.INSTANCE_LAUNCHING,
+      notificationTarget: new cdk.aws_autoscaling_hooktargets.FunctionHook(lambda)
+    });
+  }
+
+  createLambda(scope: Construct, id: string, dir: string): Function {
+    return new Function(scope, id, {
+      runtime: Runtime.PYTHON_3_8,
+      code: cdk.aws_lambda.Code.fromAsset(path.join(__dirname, dir)),
+      handler: 'index.main',
+    });
   }
 }
