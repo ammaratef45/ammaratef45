@@ -9,6 +9,7 @@ import { Bucket, BucketAccessControl, ObjectOwnership } from 'aws-cdk-lib/aws-s3
 import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
 import { Function } from "aws-cdk-lib/aws-lambda";
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -143,8 +144,8 @@ export class CdkMigrationStack extends cdk.Stack {
     return lambda;
   }
 
-  createScaleUpPolicy(): cdk.aws_iam.PolicyStatement {
-    return new cdk.aws_iam.PolicyStatement({
+  createScaleUpPolicy(): PolicyStatement {
+    return new PolicyStatement({
       actions: ['autoscaling:SetDesiredCapacity'],
       resources: ['*'],
     });
@@ -186,7 +187,24 @@ export class CdkMigrationStack extends cdk.Stack {
     const hook = new LifecycleHook(this, "attachEipHook", {
       autoScalingGroup: asg,
       lifecycleTransition: LifecycleTransition.INSTANCE_LAUNCHING,
-      notificationTarget: new cdk.aws_autoscaling_hooktargets.FunctionHook(lambda)
+      notificationTarget: new cdk.aws_autoscaling_hooktargets.FunctionHook(lambda),
+      heartbeatTimeout: cdk.Duration.seconds(300),
+    });
+    const policy = this.createEipLambdaPolicy();
+    lambda.role?.attachInlinePolicy(
+      new cdk.aws_iam.Policy(this, 'attach-eip-policy', {
+        statements: [policy],
+      }),
+    );
+  }
+
+  createEipLambdaPolicy(): PolicyStatement {
+    return new PolicyStatement({
+      actions: [
+        'autoscaling:CompleteLifecycleAction',
+        'ec2:AssociateAddress'
+      ],
+      resources: ['*'],
     });
   }
 
