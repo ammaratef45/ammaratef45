@@ -56,7 +56,12 @@ export class CdkMigrationStack extends cdk.Stack {
     // allow server instance to get the accesskey secret
     const getSecretPolicyStatement = new cdk.aws_iam.PolicyStatement({
       actions: ['secretsmanager:GetSecretValue'],
-      resources: [media_access_key_secret.secretArn],
+      resources: [
+        media_access_key_secret.secretArn,
+        'arn:aws:secretsmanager:us-east-1:835451110523:secret:cdn-public-crt-RgCjSM',
+        'arn:aws:secretsmanager:us-east-1:835451110523:secret:cdn-private-key-yha9Gn',
+        'arn:aws:secretsmanager:us-east-1:835451110523:secret:cdn-chain-lJ8Ok5'
+      ],
     });
     const getSecretPolicy = new cdk.aws_iam.Policy(this, 'getSecretPolicy', {
       statements: [getSecretPolicyStatement]

@@ -10,4 +10,11 @@ sed -i "s/AllowOverride None/AllowOverride FileInfo/g" /etc/httpd/conf/httpd.con
 touch /var/www/html/.htaccess
 yes | rm /var/www/html/.htaccess
 cp /var/www/html/scripts/.htaccess /var/www/html/
+
+# Setup TLS
+aws secretsmanager get-secret-value --region us-east-1 --secret-id cdn-private-key --query 'SecretString' --output text | base64 -d > /etc/pki/tls/private/cdn.ammaratef45.key
+aws secretsmanager get-secret-value --region us-east-1 --secret-id cdn-public-crt --query 'SecretString' --output text | base64 -d > /etc/pki/tls/certs/cdn.ammaratef45.crt
+aws secretsmanager get-secret-value --region us-east-1 --secret-id cdn-chain --query 'SecretString' --output text | base64 -d > /etc/pki/tls/certs/cdn.ammaratef45.ca-bundle
+yes | rm /etc/httpd/conf.d/ssl.conf
+cp /var/www/html/scripts/ssl.conf /etc/httpd/conf.d/
 service httpd restart
