@@ -98,16 +98,6 @@
         }]
       }
     },
-    "LoadBalancerSecurityGroup": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Properties": {
-        "GroupDescription": "Open https and https for access",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
-      ]
-      }
-    },
     "WebServerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -127,7 +117,6 @@
         "MinSize": "1",
         "MaxSize": "3",
         "TerminationPolicies": ["OldestInstance"],
-        "TargetGroupARNs": [{ "Ref": "TargetGroup" }],
         "NotificationConfiguration" : {
           "TopicARN" : { "Ref" : "NotificationTopic" },
           "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH",
@@ -151,7 +140,6 @@
         }
       }
     },
-
     "LaunchConfig": {
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Metadata" : {
@@ -292,102 +280,42 @@
     "CPUAlarmHigh": {
       "Type": "AWS::CloudWatch::Alarm",
       "Properties": {
-         "AlarmDescription": "Scale-up if CPU > 80% for 10 minutes",
-         "MetricName": "CPUUtilization",
-         "Namespace": "AWS/EC2",
-         "Statistic": "Average",
-         "Period": "300",
-         "EvaluationPeriods": "2",
-         "Threshold": "80",
-         "AlarmActions": [ { "Ref": "WebServerScaleUpPolicy" } ],
-         "Dimensions": [
-           {
-             "Name": "AutoScalingGroupName",
-             "Value": { "Ref": "WebServerGroup" }
-           }
-         ],
-         "ComparisonOperator": "GreaterThanThreshold"
-       }
-     },
-     "CPUAlarmLow": {
+        "AlarmDescription": "Scale-up if CPU > 80% for 10 minutes",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Statistic": "Average",
+        "Period": "300",
+        "EvaluationPeriods": "2",
+        "Threshold": "80",
+        "AlarmActions": [ { "Ref": "WebServerScaleUpPolicy" } ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": { "Ref": "WebServerGroup" }
+          }
+        ],
+        "ComparisonOperator": "GreaterThanThreshold"
+      }
+    },
+    "CPUAlarmLow": {
       "Type": "AWS::CloudWatch::Alarm",
       "Properties": {
-         "AlarmDescription": "Scale-down if CPU < 70% for 10 minutes",
-         "MetricName": "CPUUtilization",
-         "Namespace": "AWS/EC2",
-         "Statistic": "Average",
-         "Period": "300",
-         "EvaluationPeriods": "2",
-         "Threshold": "70",
-         "AlarmActions": [ { "Ref": "WebServerScaleDownPolicy" } ],
-         "Dimensions": [
-           {
-             "Name": "AutoScalingGroupName",
-             "Value": { "Ref": "WebServerGroup" }
-           }
-         ],
-         "ComparisonOperator": "LessThanThreshold"
-       }
-     },
-    "ApplicationLoadBalancer": {
-      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
-      "Properties": {
-          "SecurityGroups": [ { "Fn::GetAtt": [ "LoadBalancerSecurityGroup", "GroupId" ] } ],
-          "Subnets": [
-            "subnet-07c6ae5cd5bbe52f8",
-            "subnet-0f76be8a4f664b079",
-            "subnet-03dc815639f4113f1",
-            "subnet-0346d8ebb5eded80e",
-            "subnet-05df740366c23a722",
-            "subnet-09c0d0d6e5196018e"
-          ]
-        }
-    },
-    "HTTPSListener": {
-      "Type": "AWS::ElasticLoadBalancingV2::Listener",
-      "Properties": {
-        "DefaultActions": [{
-          "Type": "forward",
-          "TargetGroupArn": { "Ref": "TargetGroup" }
-        }],
-        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
-        "Port": 443,
-        "Protocol": "HTTPS"
+        "AlarmDescription": "Scale-down if CPU < 70% for 10 minutes",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Statistic": "Average",
+        "Period": "300",
+        "EvaluationPeriods": "2",
+        "Threshold": "70",
+        "AlarmActions": [ { "Ref": "WebServerScaleDownPolicy" } ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": { "Ref": "WebServerGroup" }
+          }
+        ],
+        "ComparisonOperator": "LessThanThreshold"
       }
-    },
-    "HTTPListener": {
-      "Type": "AWS::ElasticLoadBalancingV2::Listener",
-      "Properties": {
-        "DefaultActions": [{
-          "Type": "redirect",
-            "RedirectConfig": {
-              "Protocol": "HTTPS",
-              "Port": 443,
-              "Host": "#{host}",
-              "Path": "/#{path}",
-              "Query": "#{query}",
-              "StatusCode": "HTTP_301"
-            }
-        }],
-        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
-        "Port": 80,
-        "Protocol": "HTTP"
-      }
-    },
-    "TargetGroup": {
-      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
-      "Properties": {
-        "Name": { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "TargetGroup" ] ] },
-        "Port": 443,
-        "Protocol": "HTTPS",
-        "VpcId": { "Ref": "VpcId" },
-        "UnhealthyThresholdCount": 5,
-        "HealthyThresholdCount": 3,
-        "HealthCheckPath": "/health.html",
-        "HealthCheckPort": 80,
-        "HealthCheckProtocol": "HTTP"
-      },
-      "DependsOn": [ "ApplicationLoadBalancer" ]
     },
     "CodeDeployApp": {
       "Type": "AWS::CodeDeploy::Application"
@@ -495,13 +423,6 @@
         "DeploymentConfigName": "CodeDeployDefault.HalfAtATime",
         "ServiceRoleArn": { "Fn::GetAtt": ["CodeDeployRole", "Arn"]}
       }
-    }
-  },
-
-  "Outputs": {
-    "URL": {
-      "Description": "The URL of the website",
-      "Value": {"Fn::Join": ["", ["http://", {"Fn::GetAtt": ["ApplicationLoadBalancer", "DNSName"]}]]}
     }
   }
 }

@@ -71,19 +71,6 @@ export class CdkMigrationStack extends cdk.Stack {
     webServerRole.attachInlinePolicy(getSecretPolicy);
 
     // create CDN
-    const loadBalancer_cfn = cfnInclude.getResource('ApplicationLoadBalancer') as cdk.aws_elasticloadbalancingv2.CfnLoadBalancer;
-    const listner_cfn = cfnInclude.getResource('HTTPSListener') as cdk.aws_elasticloadbalancingv2.CfnListener;
-    const listener = cdk.aws_elasticloadbalancingv2.ApplicationListener.fromApplicationListenerAttributes(this, 'listener', {
-      listenerArn: listner_cfn.attrListenerArn,
-      securityGroup: cdk.aws_ec2.SecurityGroup.fromSecurityGroupId(this,'listenerSG',loadBalancer_cfn.attrSecurityGroups[0]),
-    });
-    const certificate = cdk.aws_elasticloadbalancingv2.ListenerCertificate.fromArn('arn:aws:acm:us-east-1:835451110523:certificate/0fe091aa-a16d-4660-afb8-cd5ef7b56c83');
-    listener.addCertificates('certs', [certificate]);
-    const loadBalancer = cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer.fromApplicationLoadBalancerAttributes(this, 'lb', {
-      loadBalancerArn: listner_cfn.loadBalancerArn,
-      securityGroupId: loadBalancer_cfn.attrSecurityGroups[0],
-      loadBalancerDnsName: loadBalancer_cfn.attrDnsName
-    });
     const origin = this.createOrigin();
     const cacheEnabledBehavior = this.createBehavior(CachePolicy.CACHING_OPTIMIZED, origin);
     const cacheDisabledBehavior = this.createBehavior(CachePolicy.CACHING_DISABLED, origin);
@@ -103,6 +90,12 @@ export class CdkMigrationStack extends cdk.Stack {
         'ammaratef45.com'
       ],
       certificate: cdk.aws_certificatemanager.Certificate.fromCertificateArn(this, 'cdnCert', 'arn:aws:acm:us-east-1:835451110523:certificate/58407219-e782-4e4a-8e0c-6596988aa455')
+    });
+
+    // Outputs
+    new cdk.CfnOutput(this, 'cdn dns', {
+      description: 'CDN Domain Name',
+      value: distribution.domainName
     });
   }
 
