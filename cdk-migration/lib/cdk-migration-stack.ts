@@ -11,6 +11,8 @@ import { Function } from "aws-cdk-lib/aws-lambda";
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
+const LOG_DAYS_TO_DELETE=3;
+
 export class CdkMigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -105,7 +107,7 @@ export class CdkMigrationStack extends cdk.Stack {
       objectOwnership: ObjectOwnership.OBJECT_WRITER,
       lifecycleRules: [
         {
-          expiration: cdk.Duration.days(7),
+          expiration: cdk.Duration.days(LOG_DAYS_TO_DELETE),
         }
       ]
     });
