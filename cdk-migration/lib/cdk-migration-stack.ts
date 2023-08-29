@@ -6,7 +6,7 @@ import * as path from 'path';
 import { BehaviorOptions, CachePolicy, ICachePolicy, OriginRequestPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket, BucketAccessControl, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { AutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
+import { AutoScalingGroup, IAutoScalingGroup, LifecycleHook, LifecycleTransition } from 'aws-cdk-lib/aws-autoscaling';
 import { Function } from "aws-cdk-lib/aws-lambda";
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
@@ -30,11 +30,14 @@ export class CdkMigrationStack extends cdk.Stack {
         },
     });
 
+    // ====== existing components ====== //
+    const asg = AutoScalingGroup.fromAutoScalingGroupName(this, 'asg', 'WordpressBlog-WebServerGroup-1ZQ6RC70U4DA') as AutoScalingGroup;
+
     // ========= lambda =============== //
     // lambda to recycle instances once a month
     const recycle_lambda = this.createRecycleLambda(this);
     // lambda to attach eip to new instances
-    const attach_eip_lambda = this.createAttachEipLambda(this, new CfnEIP(this, "eip", {}));
+    const attach_eip_lambda = this.createAttachEipLambda(this, asg, new CfnEIP(this, "eip", {}));
 
     // create s3 bucket for the wp media
     const media_bucket = new cdk.aws_s3.Bucket(this, 'media-bucket', {});
@@ -181,9 +184,8 @@ export class CdkMigrationStack extends cdk.Stack {
      });
   }
 
-  createAttachEipLambda(scope: Construct, eip: CfnEIP) {
+  createAttachEipLambda(scope: Construct, asg: IAutoScalingGroup, eip: CfnEIP) {
     const lambda = this.createLambda(scope, 'attachEipLambda', 'attachEipHandler');
-    const asg = AutoScalingGroup.fromAutoScalingGroupName(this, 'asg', 'WordpressBlog-WebServerGroup-1ZQ6RC70U4DA');
     const hook = new LifecycleHook(this, "attachEipHook", {
       autoScalingGroup: asg,
       lifecycleTransition: LifecycleTransition.INSTANCE_LAUNCHING,
