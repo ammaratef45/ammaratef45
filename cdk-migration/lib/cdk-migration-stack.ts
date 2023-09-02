@@ -156,7 +156,7 @@ export class CdkMigrationStack extends cdk.Stack {
 
   createSceduleRule(scope: Construct): cdk.aws_events.Rule {
     return new cdk.aws_events.Rule(scope, 'Schedule Rule', {
-      schedule: cdk.aws_events.Schedule.expression('rate(30 days)'),
+      schedule: cdk.aws_events.Schedule.expression('rate(7 days)'),
      });
   }
 
