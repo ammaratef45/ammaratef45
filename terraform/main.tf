@@ -40,7 +40,8 @@ resource "aws_autoscaling_group" "instances" {
 resource "aws_lambda_function" "recycle_lambda" {
   role = "arn:aws:iam::835451110523:role/WordpressBlog-refereshInstancesFunctionServiceRole-1BS5AXEKFTWNX"
   function_name = "WordpressBlog-refereshInstancesFunction5700A864-ThKKJgDXFtOs"
-  handler = "refresh.py"
+  filename = "${path.module}/refresh/refresh.zip"
+  handler = "index.main"
   runtime = "python3.8"
   architectures = [ "x86_64" ]
 }
