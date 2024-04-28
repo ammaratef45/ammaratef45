@@ -17,9 +17,61 @@ provider "aws" {
  region = "us-east-1"
 }
 
+# TODO: variable for vpc id
+resource "aws_security_group" "host_sg" {
+  vpc_id = "vpc-098d5d6d1fc720f01"
+    ingress {
+      protocol = "tcp"
+      from_port = "22"
+      to_port = "22"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+    ingress {
+      protocol = "tcp"
+      from_port = "80"
+      to_port = "80"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+    ingress {
+      protocol = "tcp"
+      from_port = "443"
+      to_port = "443"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+    egress {
+      cidr_blocks = [ "0.0.0.0/0" ]
+      from_port = 0
+      to_port = 0
+      protocol = -1
+    }
+}
+
+resource "aws_security_group" "db_sg" {
+  vpc_id = "vpc-098d5d6d1fc720f01"
+    ingress {
+      protocol = "tcp"
+      from_port = "3306"
+      to_port = "3306"
+      security_groups = [ aws_security_group.host_sg.id ]
+    }
+    egress {
+      cidr_blocks = [ "0.0.0.0/0" ]
+      from_port = 0
+      to_port = 0
+      protocol = -1
+    }
+}
+
 resource "aws_launch_template" "instance_template" {
   image_id      = data.aws_ami.amazon-linux-2.id
   instance_type = "t2.small"
+  vpc_security_group_ids = [aws_security_group.host_sg.id]
+  key_name = "wordpressKey"
+  user_data = base64encode(data.template_file.user_data.rendered)
+  
+  iam_instance_profile {
+    arn = "arn:aws:iam::835451110523:instance-profile/WordpressBlog-WebServerInstanceProfile-0AkbZpUoOv2z"
+  }
 }
 
 resource "aws_autoscaling_group" "instances" {
