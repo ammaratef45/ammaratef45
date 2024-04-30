@@ -71,6 +71,23 @@ data "template_file" "user_data" {
   aws secretsmanager get-secret-value --region us-east-1 --secret-id cdn-chain --query 'SecretString' --output text | base64 -d > /etc/pki/tls/certs/cdn.ammaratef45.ca-bundle
   yes | rm /etc/httpd/conf.d/ssl.conf
   aws s3 cp s3://wordpressblog-setup/ssl.conf /etc/httpd/conf.d/
+  # wp cli - install
+  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  chmod +x wp-cli.phar
+  mv wp-cli.phar /usr/bin/wp
+  wp cli update
+  curl -O https://raw.githubusercontent.com/wp-cli/wp-cli/v2.6.0/utils/wp-completion.bash
+  mv wp-completion.bash /usr/bin/
+  echo "source /usr/bin/wp-completion.bash" >> /home/ec2-user/.bashrc
+  # wp cli - install plugins
+  cd /var/www/html
+  wp plugin update akismet
+  wp theme delete twentytwenty
+  wp theme delete twentytwentyone
+  wp plugin install google-site-kit
+  wp plugin install wp-super-cache
+  wp plugin install wordpress-seo
+  wp plugin install amazon-s3-and-cloudfront
   # health-check
   echo "Instance is healthy" > /var/www/html/health.html
   # Loader.io verify ownership
