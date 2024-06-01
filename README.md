@@ -1,6 +1,5 @@
 # ammaratef45
 
-![cfn workflow](https://github.com/ammaratef45/ammaratef45/actions/workflows/cfn.yml/badge.svg)
 [![ammaratef45](https://komarev.com/ghpvc/?username=ammaratef45)](https://komarev.com/ghpvc/?username=ammaratef45)
 ![website-status](https://badgen.net/uptime-robot/status/m791661478-b8a707cde8f18d852d02d601)
 ![day-uptime](https://badgen.net/uptime-robot/day/m791661478-b8a707cde8f18d852d02d601)
