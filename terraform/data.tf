@@ -21,7 +21,8 @@ data "template_file" "user_data" {
   yum update -y
   yum upgrade -y
   yum install -y ruby httpd php php-mysqlnd mariadb mariadb-devel mariadb-libs
-  yum install -y mod_ssl php-dom php-imagick php-mbstring php-intl
+  yum install -y mod_ssl php-dom php-imagick php-mbstring php-intl docker
+  usermod -a -G docker $USER
   wget http://wordpress.org/latest.tar.gz
   tar -xf latest.tar.gz
   mv wordpress/* /var/www/html
